@@ -8,6 +8,7 @@ comment = "*/"
 keywords = ["if", "else", "void", "int", "while", "break", "switch", "default", "case", "return"]
 valid_types = ["SYMBOL", "WHITESPACE", "COMMENT", "ID", "NUM", "KEYWORD"]
 invalid_types = ["Invalid input", "Invalid number", "Unmatched comment", "Unclosed comment"]
+sigma = id + symbols + whitespace + comment
 
 
 def get_next_token(inp: str, start_char: int):
@@ -57,6 +58,13 @@ def increase_token(inp: str, type: str, next_char: chr):
     if type in ["SYMBOL", "WHITESPACE"]:
         if inp == "*" and next_char == '/':
             return True, "Unmatched comment"
+        if inp == "==":
+            return False, type
+        if inp == "=":
+            if next_char != "=":
+                return False, type
+            else:
+                return True, type
         return False, type
 
     if type == "NUM":
@@ -70,8 +78,10 @@ def increase_token(inp: str, type: str, next_char: chr):
     if type == "ID":
         if next_char in id:
             return True, type
-        else:
+        elif next_char in whitespace + symbols + comment:
             return False, type
+        elif next_char not in sigma:
+            return True, "Invalid input"
 
     if type == "COMMENT":
         if len(inp) == 1:
