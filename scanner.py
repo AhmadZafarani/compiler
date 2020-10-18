@@ -57,6 +57,13 @@ def increase_token(inp: str, type: str, next_char: chr):
     if type in ["SYMBOL", "WHITESPACE"]:
         if inp == "*" and next_char == '/':
             return True, "Unmatched comment"
+        if inp == "==":
+            return False, type
+        if inp == "=":
+            if next_char != "=":
+                return False, type
+            else:
+                return True, type
         return False, type
 
     if type == "NUM":
