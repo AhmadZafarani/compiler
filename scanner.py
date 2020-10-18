@@ -51,6 +51,9 @@ def get_next_token(inp: str, start_char: int):
                     return "Unclosed comment", token
             if token in keywords:
                 return "KEYWORD", token
+            if token[-1] not in sigma:
+                return "Invalid input", token
+
             return token_type, token
 
 
@@ -77,11 +80,15 @@ def increase_token(inp: str, type: str, next_char: chr):
 
     if type == "ID":
         if next_char in id:
+            if inp[-1] not in sigma:
+                return False, "Invalid input"
             return True, type
         elif next_char in whitespace + symbols + comment:
+            if inp[-1] not in sigma:
+                return False, "Invalid input"
             return False, type
         elif next_char not in sigma:
-            return True, "Invalid input"
+            return True, type
 
     if type == "COMMENT":
         if len(inp) == 1:
