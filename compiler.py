@@ -9,6 +9,7 @@ errors = {"Invalid number", "Invalid input", "Unmatched comment", "Unclosed comm
 # read input, tokenize it using scanner
 with open("input.txt", "r") as file:
     s = file.read()
+    s += '\n'
 i = 0
 tokens = []
 while i < len(s):
@@ -70,11 +71,16 @@ with open("symbol_table.txt", "w") as file:
     file.write(string[:-1])
 
 with open("lexical_errors.txt", "w") as file:
-    string = ""
-    for le in linely_errors:
-        for e in le[1]:
-            if e[0] != "Unclosed comment":
-                string += "%d.\t(%s, %s)\n" % (le[0], e[1], e[0])
-            else:
-                string += "%d.\t(%s..., %s)\n" % (le[0], e[1][:7], e[0])
-    file.write(string[:-1])
+    if len(linely_errors) == 0:
+        file.write("There is no lexical error.")
+    else:
+        string = ""
+        for le in linely_errors:
+            sstring = "%d.\t" % le[0]
+            for e in le[1]:
+                if e[0] != "Unclosed comment":
+                    sstring += "(%s, %s) " % (e[1], e[0])
+                else:
+                    sstring += "(%s..., %s) " % (e[1][:7], e[0])
+            string += sstring[:-1] + "\n"
+        file.write(string[:-1])
