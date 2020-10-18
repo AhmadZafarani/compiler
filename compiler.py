@@ -68,7 +68,9 @@ with open("symbol_table.txt", "w") as file:
         for d in ids:
             string += "%d.\t%s\n" % (i, d)
             i += 1
-    file.write(string[:-1])
+        file.write(string[:-1])
+    else:
+        file.write(string)
 
 with open("lexical_errors.txt", "w") as file:
     if len(linely_errors) == 0:
