@@ -1,4 +1,5 @@
-# Created by .ignore support plugin (hsz.mobi)
+*.pdf
+./PA2_Resources
 .gitignore
 .idea/
 venv/
