@@ -2,7 +2,7 @@
 # Ahmad Zaferani 97105985
 # Ali Shirmohammadi 97106068
 from scanner import get_next_token
-import anytree
+from anytree import Node, RenderTree
 
 valid_tokens = {"KEYWORD", "SYMBOL", "NUM", "WHITESPACE", "ID", "COMMENT"}
 errors = {"Invalid number", "Invalid input", "Unmatched comment", "Unclosed comment"}
@@ -156,45 +156,67 @@ while i < len(s):
     t = get_next_token(s, i)
     i += len(t[1])
     tokens.append(t)
+tokens.append(('KEYWORD', '$'))
 
 # main parser program
-stack = ['$', 'Program']
+stack = ['Program']
+root = Node('Program')
 token_index = 0
+
+
+def find_in_table(row, col):
+    ii = 0
+    jj = 0
+    for ii in range(1, parse_table_dim[0]):
+        if row == parse_table[ii][0]:
+            break
+    for jj in range(1, parse_table_dim[1]):
+        if col == parse_table[0][jj]:
+            break
+    return parse_table[ii][jj]
+
+
 while stack:
     t = tokens[token_index]
-    a = t[1]
+    if t[0] == 'SYMBOL' or t[0] == 'KEYWORD':
+        a = t[1]
+    else:
+        a = t[0]
     X = stack[-1]
     if t[0] in valid_tokens:
-        if a == 'WHITESPACE' or a == 'COMMENT':
+        if t[0] == 'WHITESPACE' or t[0] == 'COMMENT':
             token_index += 1
             continue
 
-        if X == a and a == '$':
-            pass  # todo: finish parsing - check success conditions
+        print(X, a)
+        if X == a == '$':
+            print("Compiled Successfully!")
+            break
         elif X == a and a != '$':
             stack.pop()
             token_index += 1
         elif X not in parse_table[0]:
-            M = ''
-            i = 0
-            j = 0
-            for i in range(1, parse_table_dim[0]):
-                if X == parse_table[i][0]:
-                    break
-            for j in range(1, parse_table_dim[1]):
-                if a == parse_table[0][j]:
-                    break
-            M = parse_table[i][j]
+            M = find_in_table(X, a)
+            print(M)
+
             if isinstance(M, list):
                 stack.pop()
                 for s in reversed(M):
                     stack.append(s)
+            elif M == 'epsilon':
+                stack.pop()
             else:
                 pass  # todo: panic mode
         else:
             pass  # todo: handle!
+        print(stack, token_index)
 
     elif t[0] in errors:
         raise Exception("Lexical Error: ", t)
     else:
         raise ValueError(t)
+
+# create parse tree
+# with open("parse_tree.txt", 'w') as file:
+for pre, fill, node in RenderTree(root):
+    print("%s%s" % (pre, node.name))
