@@ -176,6 +176,9 @@ def find_in_table(row, col):
     return parse_table[ii][jj]
 
 
+line_counter = 1
+linely_syntax_errors = []
+this_line_syntax_errors = []
 while stack:
     t = tokens[token_index]
     if t[0] == 'SYMBOL' or t[0] == 'KEYWORD':
@@ -185,6 +188,11 @@ while stack:
     X = stack[-1]
     if t[0] in valid_tokens:
         if t[0] == 'WHITESPACE' or t[0] == 'COMMENT':
+            if t[1] == "\n":
+                if len(this_line_syntax_errors) != 0:
+                    linely_syntax_errors.append((line_counter, this_line_syntax_errors.copy()))
+                    this_line_syntax_errors = []
+                line_counter += 1
             token_index += 1
             continue
 
@@ -205,8 +213,20 @@ while stack:
                     stack.append(s)
             elif M == 'epsilon':
                 stack.pop()
-            else:
-                pass  # todo: panic mode
+            elif M == '':  # panic mode starts from here
+                if a == '$':
+                    this_line_syntax_errors.append("unexpected EOF")
+                    line_counter -= 1
+                    break
+                token_index += 1
+                this_line_syntax_errors.append("illegal %s" % a)
+                print(this_line_syntax_errors)
+            elif M == 'synch':
+                stack.pop()
+                this_line_syntax_errors.append("Missing %s" % X)
+        elif X in parse_table[0]:
+            stack.pop()
+            this_line_syntax_errors.append("Missing %s" % X)
         else:
             pass  # todo: handle!
         print(stack, token_index)
@@ -215,8 +235,21 @@ while stack:
         raise Exception("Lexical Error: ", t)
     else:
         raise ValueError(t)
+if len(this_line_syntax_errors) != 0:
+    linely_syntax_errors.append((line_counter, this_line_syntax_errors))
 
 # create parse tree
-# with open("parse_tree.txt", 'w') as file:
-for pre, fill, node in RenderTree(root):
-    print("%s%s" % (pre, node.name))
+# with open("parse_tree.txt", 'w', encoding='utf-8') as file:
+#     for pre, fill, node in RenderTree(root):
+#         file.write("%s%s" % (pre, node.name))
+
+# create syntax errors file
+with open("syntax_errors.txt", "w") as file:
+    if len(linely_syntax_errors) == 0:
+        file.write("There is no syntax error.\n")
+    else:
+        string = ""
+        for le in linely_syntax_errors:
+            for e in le[1]:
+                string += "#%d : syntax error, %s\n" % (le[0], e)
+        file.write(string)
