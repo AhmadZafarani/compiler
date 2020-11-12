@@ -17,7 +17,7 @@ parse_table = [
     ['Declaration', ['Declaration-initial', 'Declaration-prime'], ['Declaration-initial', 'Declaration-prime'], 'synch',
      'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch',
      'synch', '', '', '', '', '', '', '', '', '', '', '', ''],
-    ['Declaration-initial', ['TypeSpecifier', 'ID'], ['TypeSpecifier', 'ID'], '', '', '', 'synch', '', '', '', '', '',
+    ['Declaration-initial', ['Type-specifier', 'ID'], ['Type-specifier', 'ID'], '', '', '', 'synch', '', '', '', '', '',
      '', '', 'synch', '', '', 'synch', 'synch', 'synch', '', '', '', '', '', '', '', '', ''],
     ['Declaration-prime', 'synch', 'synch', 'synch', 'synch', 'synch', ['Var-declaration-prime'], 'synch', 'synch',
      'synch', 'synch', 'synch', 'synch', 'synch', ['Fun-declaration-prime'], 'synch', 'synch',
@@ -29,21 +29,21 @@ parse_table = [
     ['Fun-declaration-prime', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch',
      'synch', 'synch', 'synch', ['(', 'Params', ')', 'Compound-stmt'], 'synch', 'synch', '', '', '', '', '', '', '', '',
      '', '', '', ''],
-    ['TypeSpecifier', ['int'], ['void'], '', '', '', '', '', '', '', '', 'synch', '', '', '', '', '', '', '', '', '',
+    ['Type-specifier', ['int'], ['void'], '', '', '', '', '', '', '', '', 'synch', '', '', '', '', '', '', '', '', '',
      '', '', '', '', '', '', '', ''],
-    ['Params', ['int', 'ID', 'Param--prime', 'Param-list'], ['void', 'Param-list-void-abtar'], '', '', '', '', '', '',
+    ['Params', ['int', 'ID', 'Param-prime', 'Param-list'], ['void', 'Param-list-void-abtar'], '', '', '', '', '', '',
      '',
      '',
      '', '', '', '', '', '', '', '', 'synch', '', '', '', '', '', '', '', '', ''],
-    ['Param-list-void-abtar', '', '', '', '', '', '', '', '', '', '', ['ID', 'Param--prime', 'Param-list'], '', '', '',
+    ['Param-list-void-abtar', '', '', '', '', '', '', '', '', '', '', ['ID', 'Param-prime', 'Param-list'], '', '', '',
      '',
      '', '', '', 'epsilon', '', '', '', '', '', '', '', '', ''],
     ['Param-list', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', [',', 'Param', 'Param-list'],
      'epsilon', '', '', '', '', '', '', '', '', ''],
-    ['Param', ['Declaration-initial', 'Param--prime'], ['Declaration-initial', 'Param--prime'], '', '', '', '', '', '',
+    ['Param', ['Declaration-initial', 'Param-prime'], ['Declaration-initial', 'Param-prime'], '', '', '', '', '', '',
      '',
      '', '', '', '', '', '', '', '', 'synch', 'synch', '', '', '', '', '', '', '', '', ''],
-    ['Param--prime', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ['[', ']'], 'epsilon', 'epsilon',
+    ['Param-prime', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ['[', ']'], 'epsilon', 'epsilon',
      '',
      '', '', '', '', '', '', '', ''],
     ['Compound-stmt', 'synch', 'synch', 'synch', ['{', 'Declaration-list', 'Statement-list', '}'], 'synch', 'synch',
@@ -86,8 +86,8 @@ parse_table = [
      ['Simple-expression-zegond'], ['Simple-expression-zegond'], ['Simple-expression-zegond'], '', '', 'synch', 'synch',
      '',
      '', '', 'synch', '', '', '', '', ''],
-    ['B', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['Simple-expression-prime'], ['Simple-expression-prime'],
-     ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'], 'epsilon', 'epsilon', '', '', '', 'epsilon',
+    ['B', '', '', '', '', '', ['Simple-expression-prime'], '', '', '', '', '', ['Simple-expression-prime'], ['Simple-expression-prime'],
+     ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'], ['Simple-expression-prime'], ['Simple-expression-prime'], '', '', '', ['Simple-expression-prime'],
      ['=', 'Expression'], ['Simple-expression-prime'], ['Simple-expression-prime'], ['Simple-expression-prime'],
      ['Simple-expression-prime']],
     ['H', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', '',
@@ -97,10 +97,10 @@ parse_table = [
      ['Additive-expression-zegond', 'C'], ['Additive-expression-zegond', 'C'], ['Additive-expression-zegond', 'C'], '',
      '',
      'synch', 'synch', '', '', '', 'synch', '', '', '', '', ''],
-    ['Simple-expression-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['Additive-expression-prime', 'C'],
-     ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '', '', 'epsilon', 'epsilon', '', '',
+    ['Simple-expression-prime', '', '', '', '', '', ['Additive-expression-prime', 'C'], '', '', '', '', '', ['Additive-expression-prime', 'C'],
+     ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '', '', ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '',
      '',
-     'epsilon', '', ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'],
+     ['Additive-expression-prime', 'C'], '', ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'],
      ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C']],
     ['C', '', '', '', '', '', 'epsilon', '', '', '', '', '', '', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '',
      'epsilon', '', '', ['Relop', 'Additive-expression'], ['Relop', 'Additive-expression'], ''],
@@ -108,9 +108,9 @@ parse_table = [
      '', '', '', '', '', ['<'], ['=='], ''],
     ['Additive-expression', '', '', '', '', '', 'synch', '', '', '', '', ['Term', 'D'], ['Term', 'D'], ['Term', 'D'],
      ['Term', 'D'], ['Term', 'D'], '', '', 'synch', 'synch', '', '', '', 'synch', '', '', '', '', ''],
-    ['Additive-expression-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['Term-prime', 'D'],
-     ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '',
-     ['Term-prime', 'D'], 'epsilon', 'epsilon', ['Term-prime', 'D']],
+    ['Additive-expression-prime', '', '', '', '', '', ['Term-prime', 'D'], '', '', '', '', '', ['Term-prime', 'D'],
+     ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '', ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '', ['Term-prime', 'D'], '',
+     ['Term-prime', 'D'], ['Term-prime', 'D'], ['Term-prime', 'D'], ['Term-prime', 'D']],
     ['Additive-expression-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Term-zegond', 'D'],
      ['Term-zegond', 'D'], ['Term-zegond', 'D'], ['Term-zegond', 'D'], '', '', 'synch', 'synch', '', '', '', 'synch',
      '',
@@ -123,9 +123,9 @@ parse_table = [
      ['Signed-factor', 'G'], ['Signed-factor', 'G'], ['Signed-factor', 'G'], '', '', 'synch', 'synch', '', '', '',
      'synch',
      '', '', 'synch', 'synch', ''],
-    ['Term-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon',
+    ['Term-prime', '', '', '', '', '', ['Signed-factor-prime', 'G'], '', '', '', '', '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'],
      ['Signed-factor-prime', 'G'],
-     '', '', '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '', ['Signed-factor-prime', 'G'], 'epsilon', 'epsilon',
+     '', '', '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'], '', '', '', ['Signed-factor-prime', 'G'], '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'],
      ['Signed-factor-prime', 'G']],
     ['Term-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Signed-factor-zegond', 'G'],
      ['Signed-factor-zegond', 'G'], ['Signed-factor-zegond', 'G'], ['Signed-factor-zegond', 'G'], '', '', 'synch',
@@ -135,17 +135,17 @@ parse_table = [
      '', '', '', 'epsilon', '', ['*', 'Signed-factor', 'G'], 'epsilon', 'epsilon', ''],
     ['Signed-factor', '', '', '', '', '', 'synch', '', '', '', '', ['Factor'], ['+', 'Factor'], ['-', 'Factor'],
      ['Factor'], ['Factor'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch', ''],
-    ['Signed-factor-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', ['Factor-prime'],
+    ['Signed-factor-prime', '', '', '', '', '', ['Factor-prime'], '', '', '', '', '', ['Factor-prime'], ['Factor-prime'], ['Factor-prime'],
      '',
-     '', '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon', 'epsilon', ['Factor-prime']],
+     '', '', ['Factor-prime'], ['Factor-prime'], '', '', '', ['Factor-prime'], '', ['Factor-prime'], ['Factor-prime'], ['Factor-prime'], ['Factor-prime']],
     ['Signed-factor-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['+', 'Factor'], ['-', 'Factor'],
      ['Factor-zegond'], ['Factor-zegond'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch',
      ''],
     ['Factor', '', '', '', '', '', 'synch', '', '', '', '', ['ID', 'Var-call-prime'], 'synch', 'synch',
      ['(', 'Expression', ')'], ['NUM'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch',
      ''],
-    ['Var-call-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', ['(', 'Args', ')'], '',
-     '', ['Var-prime'], 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon', 'epsilon', ''],
+    ['Var-call-prime', '', '', '', '', '', ['Var-prime'], '', '', '', '', '', ['Var-prime'], ['Var-prime'], ['(', 'Args', ')'], '',
+     '', ['Var-prime'], ['Var-prime'], ['Var-prime'], '', '', '', ['Var-prime'], '', ['Var-prime'], ['Var-prime'], ['Var-prime'], ''],
     ['Var-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '',
      ['[', 'Expression', ']'], 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon', 'epsilon', ''],
     ['Factor-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', ['(', 'Args', ')'], '',
@@ -215,12 +215,13 @@ while stack:
             token_index += 1
             continue
 
-        print(stack_head, next_token)
+        print(stack_head.name, next_token)
         if stack_head.name == next_token == '$':
             print("Compiled Successfully!")
             break
         elif stack_head.name == next_token and next_token != '$':
-            stack.pop()
+            node = stack.pop()
+            node.name = '(%s, %s) ' % (t[0], t[1])
             token_index += 1
         elif stack_head.name not in parse_table[0]:
             M = find_in_table(stack_head.name, next_token)
@@ -231,6 +232,7 @@ while stack:
                 node_list = list(map(lambda m : Node(m, parent=non_terminal), M))
                 stack += reversed(node_list)
             elif M == 'epsilon':
+                Node("epsilon", parent=stack_head)
                 non_terminal = stack.pop()
             elif M == '':  # panic mode starts from here
                 if next_token == '$':
@@ -241,14 +243,16 @@ while stack:
                 this_line_syntax_errors.append("illegal %s" % next_token)
                 print(this_line_syntax_errors)
             elif M == 'synch':
-                stack.pop()
-                this_line_syntax_errors.append("Missing %s" % stack_head)
+                popped_node = stack.pop()
+                this_line_syntax_errors.append("Missing %s" % stack_head.name)
+                popped_node.parent = None
         elif stack_head in parse_table[0]:
-            stack.pop()
-            this_line_syntax_errors.append("Missing %s" % stack_head)
+            popped_node = stack.pop()
+            this_line_syntax_errors.append("Missing %s" % stack_head.name)
+            popped_node.parent = None
         else:
             pass  # todo: handle!
-        print(stack, token_index)
+        print(list(map(lambda m: m.name, stack)), token_index)
 
     elif t[0] in errors:
         raise Exception("Lexical Error: ", t)
@@ -260,7 +264,7 @@ if len(this_line_syntax_errors) != 0:
 # create parse tree
 with open("parse_tree.txt", 'w', encoding='utf-8') as file:
     for pre, _, node in RenderTree(root):
-        print("%s%s" % (pre, node.name))
+        file.write("%s%s\n" % (pre, node.name))
 
 # create syntax errors file
 with open("syntax_errors.txt", "w") as file:
