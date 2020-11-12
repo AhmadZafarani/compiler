@@ -179,7 +179,7 @@ tokens.append(('KEYWORD', '$'))
 # main parser program
 stack = ['Program']
 root = Node('Program')
-parent_stack = [root]
+parent = root
 token_index = 0
 
 
@@ -201,9 +201,9 @@ this_line_syntax_errors = []
 while stack:
     t = tokens[token_index]
     if t[0] == 'SYMBOL' or t[0] == 'KEYWORD':
-        a = t[1]
+        next_token = t[1]
     else:
-        a = t[0]
+        next_token = t[0]
     stack_head = stack[-1]
     if t[0] in valid_tokens:
         if t[0] == 'WHITESPACE' or t[0] == 'COMMENT':
@@ -215,30 +215,33 @@ while stack:
             token_index += 1
             continue
 
-        print(stack_head, a)
-        if stack_head == a == '$':
+        print(stack_head, next_token)
+        if stack_head == next_token == '$':
             print("Compiled Successfully!")
             break
-        elif stack_head == a and a != '$':
+        elif stack_head == next_token and next_token != '$':
             stack.pop()
             token_index += 1
         elif stack_head not in parse_table[0]:
-            M = find_in_table(stack_head, a)
+            M = find_in_table(stack_head, next_token)
             print(M)
 
             if isinstance(M, list):
-                stack.pop()
+                non_terminal = stack.pop()
+
+                for node_name in M:
+                    node = Node(node_name, parent=parent)
                 for s in reversed(M):
                     stack.append(s)
             elif M == 'epsilon':
-                stack.pop()
+                non_terminal = stack.pop()
             elif M == '':  # panic mode starts from here
-                if a == '$':
+                if next_token == '$':
                     this_line_syntax_errors.append("unexpected EOF")
                     line_counter -= 1
                     break
                 token_index += 1
-                this_line_syntax_errors.append("illegal %s" % a)
+                this_line_syntax_errors.append("illegal %s" % next_token)
                 print(this_line_syntax_errors)
             elif M == 'synch':
                 stack.pop()
