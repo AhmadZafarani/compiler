@@ -177,9 +177,9 @@ while i < len(s):
 tokens.append(('KEYWORD', '$'))
 
 # main parser program
-stack = ['Program']
 root = Node('Program')
-parent = root
+stack = [root]
+
 token_index = 0
 
 
@@ -216,23 +216,20 @@ while stack:
             continue
 
         print(stack_head, next_token)
-        if stack_head == next_token == '$':
+        if stack_head.name == next_token == '$':
             print("Compiled Successfully!")
             break
-        elif stack_head == next_token and next_token != '$':
+        elif stack_head.name == next_token and next_token != '$':
             stack.pop()
             token_index += 1
-        elif stack_head not in parse_table[0]:
-            M = find_in_table(stack_head, next_token)
+        elif stack_head.name not in parse_table[0]:
+            M = find_in_table(stack_head.name, next_token)
             print(M)
 
             if isinstance(M, list):
                 non_terminal = stack.pop()
-
-                for node_name in M:
-                    node = Node(node_name, parent=parent)
-                for s in reversed(M):
-                    stack.append(s)
+                node_list = list(map(lambda m : Node(m, parent=non_terminal), M))
+                stack += reversed(node_list)
             elif M == 'epsilon':
                 non_terminal = stack.pop()
             elif M == '':  # panic mode starts from here
