@@ -90,8 +90,8 @@ parse_table = [
      ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'], ['Simple-expression-prime'], ['Simple-expression-prime'], '', '', '', ['Simple-expression-prime'],
      ['=', 'Expression'], ['Simple-expression-prime'], ['Simple-expression-prime'], ['Simple-expression-prime'],
      ['Simple-expression-prime']],
-    ['H', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', '',
-     'epsilon', 'epsilon', '', '', '', 'epsilon', ['=', 'Expression'], ['G', 'D', 'C'], ['G', 'D', 'C'],
+    ['H', '', '', '', '', '', ['G', 'D', 'C'], '', '', '', '', '', ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', '',
+     ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', ['G', 'D', 'C'], ['=', 'Expression'], ['G', 'D', 'C'], ['G', 'D', 'C'],
      ['G', 'D', 'C'], ''],
     ['Simple-expression-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Additive-expression-zegond', 'C'],
      ['Additive-expression-zegond', 'C'], ['Additive-expression-zegond', 'C'], ['Additive-expression-zegond', 'C'], '',
@@ -179,7 +179,6 @@ tokens.append(('KEYWORD', '$'))
 # main parser program
 root = Node('Program')
 stack = [root]
-
 token_index = 0
 
 
@@ -246,7 +245,7 @@ while stack:
                 popped_node = stack.pop()
                 this_line_syntax_errors.append("Missing %s" % stack_head.name)
                 popped_node.parent = None
-        elif stack_head in parse_table[0]:
+        elif stack_head.name in parse_table[0]:
             popped_node = stack.pop()
             this_line_syntax_errors.append("Missing %s" % stack_head.name)
             popped_node.parent = None
