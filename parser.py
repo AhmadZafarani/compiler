@@ -179,6 +179,7 @@ tokens.append(('KEYWORD', '$'))
 # main parser program
 stack = ['Program']
 root = Node('Program')
+parent_stack = [root]
 token_index = 0
 
 
@@ -203,7 +204,7 @@ while stack:
         a = t[1]
     else:
         a = t[0]
-    X = stack[-1]
+    stack_head = stack[-1]
     if t[0] in valid_tokens:
         if t[0] == 'WHITESPACE' or t[0] == 'COMMENT':
             if t[1] == "\n":
@@ -214,15 +215,15 @@ while stack:
             token_index += 1
             continue
 
-        print(X, a)
-        if X == a == '$':
+        print(stack_head, a)
+        if stack_head == a == '$':
             print("Compiled Successfully!")
             break
-        elif X == a and a != '$':
+        elif stack_head == a and a != '$':
             stack.pop()
             token_index += 1
-        elif X not in parse_table[0]:
-            M = find_in_table(X, a)
+        elif stack_head not in parse_table[0]:
+            M = find_in_table(stack_head, a)
             print(M)
 
             if isinstance(M, list):
@@ -241,10 +242,10 @@ while stack:
                 print(this_line_syntax_errors)
             elif M == 'synch':
                 stack.pop()
-                this_line_syntax_errors.append("Missing %s" % X)
-        elif X in parse_table[0]:
+                this_line_syntax_errors.append("Missing %s" % stack_head)
+        elif stack_head in parse_table[0]:
             stack.pop()
-            this_line_syntax_errors.append("Missing %s" % X)
+            this_line_syntax_errors.append("Missing %s" % stack_head)
         else:
             pass  # todo: handle!
         print(stack, token_index)
@@ -257,9 +258,9 @@ if len(this_line_syntax_errors) != 0:
     linely_syntax_errors.append((line_counter, this_line_syntax_errors))
 
 # create parse tree
-# with open("parse_tree.txt", 'w', encoding='utf-8') as file:
-#     for pre, fill, node in RenderTree(root):
-#         file.write("%s%s" % (pre, node.name))
+with open("parse_tree.txt", 'w', encoding='utf-8') as file:
+    for pre, _, node in RenderTree(root):
+        print("%s%s" % (pre, node.name))
 
 # create syntax errors file
 with open("syntax_errors.txt", "w") as file:
