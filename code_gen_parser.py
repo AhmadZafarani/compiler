@@ -2,6 +2,7 @@
 # Ahmad Zaferani 97105985
 # Ali Shirmohammadi 97106068
 from scanner import get_next_token
+from intermediate_code_generator import code_gen, action_symbols, program_block
 
 valid_tokens = {"KEYWORD", "SYMBOL", "NUM", "WHITESPACE", "ID", "COMMENT"}
 errors = {"Invalid number", "Invalid input", "Unmatched comment", "Unclosed comment"}
@@ -210,8 +211,7 @@ while parser_stack:
             print("Compiled Successfully!")
             break
         elif parser_stack_head == next_token and next_token != '$':
-            node = parser_stack.pop()
-            node.name = '(%s, %s) ' % (t[0], t[1])
+            parser_stack.pop()
             token_index += 1
         elif parser_stack_head not in parse_table[0]:
             M = find_in_table(parser_stack_head, next_token)
@@ -226,6 +226,9 @@ while parser_stack:
                 raise Exception("Nahvi Error: ", parser_stack, t)
         elif parser_stack_head in parse_table[0]:
             parser_stack.pop()
+        elif parser_stack_head in action_symbols:
+            code_gen(parser_stack_head, t[1])
+            parser_stack.pop()
         else:
             raise Exception("Nahvi Error: ", parser_stack, t)
         print(parser_stack, token_index)
@@ -234,3 +237,7 @@ while parser_stack:
         raise Exception("Lexical Error: ", t)
     else:
         raise ValueError(t)
+
+
+with open("output.txt", "w") as file:
+    file.writelines(program_block)
