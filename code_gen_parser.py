@@ -32,20 +32,15 @@ parse_table = [
     ['Type-specifier', ['int'], ['void'], '', '', '', '', '', '', '', '', 'synch', '', '', '', '', '', '', '', '', '',
      '', '', '', '', '', '', '', ''],
     ['Params', ['int', 'ID', 'Param-prime', 'Param-list'], ['void', 'Param-list-void-abtar'], '', '', '', '', '', '',
-     '',
-     '',
-     '', '', '', '', '', '', '', '', 'synch', '', '', '', '', '', '', '', '', ''],
+     '', '', '', '', '', '', '', '', '', '', 'synch', '', '', '', '', '', '', '', '', ''],
     ['Param-list-void-abtar', '', '', '', '', '', '', '', '', '', '', ['ID', 'Param-prime', 'Param-list'], '', '', '',
-     '',
-     '', '', '', 'epsilon', '', '', '', '', '', '', '', '', ''],
+     '', '', '', '', 'epsilon', '', '', '', '', '', '', '', '', ''],
     ['Param-list', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', [',', 'Param', 'Param-list'],
      'epsilon', '', '', '', '', '', '', '', '', ''],
     ['Param', ['Declaration-initial', 'Param-prime'], ['Declaration-initial', 'Param-prime'], '', '', '', '', '', '',
-     '',
-     '', '', '', '', '', '', '', '', 'synch', 'synch', '', '', '', '', '', '', '', '', ''],
+     '', '', '', '', '', '', '', '', '', 'synch', 'synch', '', '', '', '', '', '', '', '', ''],
     ['Param-prime', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ['[', ']'], 'epsilon', 'epsilon',
-     '',
-     '', '', '', '', '', '', '', ''],
+     '', '', '', '', '', '', '', '', ''],
     ['Compound-stmt', 'synch', 'synch', 'synch', ['{', 'Declaration-list', 'Statement-list', '}'], 'synch', 'synch',
      'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', '', '', '', 'synch',
      'synch', 'synch', '', '', '', '', '', ''],
@@ -84,21 +79,23 @@ parse_table = [
      ['default', ':', 'Statement-list'], '', '', '', '', '', ''],
     ['Expression', '', '', '', '', '', 'synch', '', '', '', '', ['ID', 'B'], ['Simple-expression-zegond'],
      ['Simple-expression-zegond'], ['Simple-expression-zegond'], ['Simple-expression-zegond'], '', '', 'synch', 'synch',
-     '',
-     '', '', 'synch', '', '', '', '', ''],
-    ['B', '', '', '', '', '', ['Simple-expression-prime'], '', '', '', '', '', ['Simple-expression-prime'], ['Simple-expression-prime'],
-     ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'], ['Simple-expression-prime'], ['Simple-expression-prime'], '', '', '', ['Simple-expression-prime'],
+     '', '', '', 'synch', '', '', '', '', ''],
+    ['B', '', '', '', '', '', ['Simple-expression-prime'], '', '', '', '', '', ['Simple-expression-prime'],
+     ['Simple-expression-prime'],
+     ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'], ['Simple-expression-prime'],
+     ['Simple-expression-prime'], '', '', '', ['Simple-expression-prime'],
      ['=', 'Expression'], ['Simple-expression-prime'], ['Simple-expression-prime'], ['Simple-expression-prime'],
      ['Simple-expression-prime']],
     ['H', '', '', '', '', '', ['G', 'D', 'C'], '', '', '', '', '', ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', '',
-     ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', ['G', 'D', 'C'], ['=', 'Expression'], ['G', 'D', 'C'], ['G', 'D', 'C'],
-     ['G', 'D', 'C'], ''],
+     ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', ['G', 'D', 'C'], ['=', 'Expression'], ['G', 'D', 'C'],
+     ['G', 'D', 'C'], ['G', 'D', 'C'], ''],
     ['Simple-expression-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Additive-expression-zegond', 'C'],
      ['Additive-expression-zegond', 'C'], ['Additive-expression-zegond', 'C'], ['Additive-expression-zegond', 'C'], '',
-     '',
-     'synch', 'synch', '', '', '', 'synch', '', '', '', '', ''],
-    ['Simple-expression-prime', '', '', '', '', '', ['Additive-expression-prime', 'C'], '', '', '', '', '', ['Additive-expression-prime', 'C'],
-     ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '', '', ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '',
+     '', 'synch', 'synch', '', '', '', 'synch', '', '', '', '', ''],
+    ['Simple-expression-prime', '', '', '', '', '', ['Additive-expression-prime', 'C'], '', '', '', '', '',
+     ['Additive-expression-prime', 'C'],
+     ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '', '',
+     ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'], '', '',
      '',
      ['Additive-expression-prime', 'C'], '', ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C'],
      ['Additive-expression-prime', 'C'], ['Additive-expression-prime', 'C']],
@@ -109,48 +106,49 @@ parse_table = [
     ['Additive-expression', '', '', '', '', '', 'synch', '', '', '', '', ['Term', 'D'], ['Term', 'D'], ['Term', 'D'],
      ['Term', 'D'], ['Term', 'D'], '', '', 'synch', 'synch', '', '', '', 'synch', '', '', '', '', ''],
     ['Additive-expression-prime', '', '', '', '', '', ['Term-prime', 'D'], '', '', '', '', '', ['Term-prime', 'D'],
-     ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '', ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '', ['Term-prime', 'D'], '',
+     ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '', ['Term-prime', 'D'], ['Term-prime', 'D'], '', '', '',
+     ['Term-prime', 'D'], '',
      ['Term-prime', 'D'], ['Term-prime', 'D'], ['Term-prime', 'D'], ['Term-prime', 'D']],
     ['Additive-expression-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Term-zegond', 'D'],
      ['Term-zegond', 'D'], ['Term-zegond', 'D'], ['Term-zegond', 'D'], '', '', 'synch', 'synch', '', '', '', 'synch',
-     '',
-     '', 'synch', 'synch', ''],
+     '', '', 'synch', 'synch', ''],
     ['D', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['Addop', 'Term', 'D'], ['Addop', 'Term', 'D'], '', '', '',
      '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '', '', 'epsilon', 'epsilon', ''],
     ['Addop', '', '', '', '', '', '', '', '', '', '', 'synch', ['+'], ['-'], 'synch', 'synch', '', '', '', '', '', '',
      '', '', '', '', '', '', ''],
     ['Term', '', '', '', '', '', 'synch', '', '', '', '', ['Signed-factor', 'G'], ['Signed-factor', 'G'],
      ['Signed-factor', 'G'], ['Signed-factor', 'G'], ['Signed-factor', 'G'], '', '', 'synch', 'synch', '', '', '',
-     'synch',
-     '', '', 'synch', 'synch', ''],
-    ['Term-prime', '', '', '', '', '', ['Signed-factor-prime', 'G'], '', '', '', '', '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'],
-     ['Signed-factor-prime', 'G'],
-     '', '', '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'], '', '', '', ['Signed-factor-prime', 'G'], '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'],
+     'synch', '', '', 'synch', 'synch', ''],
+    ['Term-prime', '', '', '', '', '', ['Signed-factor-prime', 'G'], '', '', '', '', '', ['Signed-factor-prime', 'G'],
+     ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'],
+     '', '', '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'], '', '', '', ['Signed-factor-prime', 'G'],
+     '', ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'], ['Signed-factor-prime', 'G'],
      ['Signed-factor-prime', 'G']],
     ['Term-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Signed-factor-zegond', 'G'],
      ['Signed-factor-zegond', 'G'], ['Signed-factor-zegond', 'G'], ['Signed-factor-zegond', 'G'], '', '', 'synch',
-     'synch',
-     '', '', '', 'synch', '', '', 'synch', 'synch', ''],
+     'synch', '', '', '', 'synch', '', '', 'synch', 'synch', ''],
     ['G', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '', '', 'epsilon', 'epsilon',
      '', '', '', 'epsilon', '', ['*', 'Signed-factor', 'G'], 'epsilon', 'epsilon', ''],
     ['Signed-factor', '', '', '', '', '', 'synch', '', '', '', '', ['Factor'], ['+', 'Factor'], ['-', 'Factor'],
      ['Factor'], ['Factor'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch', ''],
-    ['Signed-factor-prime', '', '', '', '', '', ['Factor-prime'], '', '', '', '', '', ['Factor-prime'], ['Factor-prime'], ['Factor-prime'],
-     '',
-     '', '', ['Factor-prime'], ['Factor-prime'], '', '', '', ['Factor-prime'], '', ['Factor-prime'], ['Factor-prime'], ['Factor-prime'], ['Factor-prime']],
+    ['Signed-factor-prime', '', '', '', '', '', ['Factor-prime'], '', '', '', '', '', ['Factor-prime'],
+     ['Factor-prime'], ['Factor-prime'], '',
+     '', '', ['Factor-prime'], ['Factor-prime'], '', '', '', ['Factor-prime'], '', ['Factor-prime'], ['Factor-prime'],
+     ['Factor-prime'], ['Factor-prime']],
     ['Signed-factor-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['+', 'Factor'], ['-', 'Factor'],
      ['Factor-zegond'], ['Factor-zegond'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch',
      ''],
     ['Factor', '', '', '', '', '', 'synch', '', '', '', '', ['ID', 'Var-call-prime'], 'synch', 'synch',
      ['(', 'Expression', ')'], ['NUM'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch',
      ''],
-    ['Var-call-prime', '', '', '', '', '', ['Var-prime'], '', '', '', '', '', ['Var-prime'], ['Var-prime'], ['(', 'Args', ')'], '',
-     '', ['Var-prime'], ['Var-prime'], ['Var-prime'], '', '', '', ['Var-prime'], '', ['Var-prime'], ['Var-prime'], ['Var-prime'], ''],
+    ['Var-call-prime', '', '', '', '', '', ['Var-prime'], '', '', '', '', '', ['Var-prime'], ['Var-prime'],
+     ['(', 'Args', ')'], '',
+     '', ['Var-prime'], ['Var-prime'], ['Var-prime'], '', '', '', ['Var-prime'], '', ['Var-prime'], ['Var-prime'],
+     ['Var-prime'], ''],
     ['Var-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '',
      ['[', 'Expression', ']'], 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon', 'epsilon', ''],
     ['Factor-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', ['(', 'Args', ')'], '',
-     '',
-     '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon', 'epsilon', ''],
+     '', '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon', 'epsilon', ''],
     ['Factor-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', 'synch', 'synch', ['(', 'Expression', ')'],
      ['NUM'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch', ''],
     ['Args', '', '', '', '', '', '', '', '', '', '', ['Arg-list'], ['Arg-list'], ['Arg-list'], ['Arg-list'],
@@ -193,13 +191,16 @@ def find_in_table(row, col):
     return parse_table[ii][jj]
 
 
-line_counter = 1
+ids = set()
 while parser_stack:
     t = tokens[token_index]
     if t[0] == 'SYMBOL' or t[0] == 'KEYWORD':
         next_token = t[1]
     else:
         next_token = t[0]
+        if t[0] == "ID":
+            if t[1] not in ids:
+                ids.add(t[1])
     parser_stack_head = parser_stack[-1]
     if t[0] in valid_tokens:
         if t[0] == 'WHITESPACE' or t[0] == 'COMMENT':
@@ -223,14 +224,14 @@ while parser_stack:
             elif M == 'epsilon':
                 non_terminal = parser_stack.pop()
             else:
-                raise Exception("Nahvi Error: ", parser_stack, t)
+                raise Exception("Syntax Error: ", parser_stack, t)
         elif parser_stack_head in parse_table[0]:
             parser_stack.pop()
         elif parser_stack_head in action_symbols:
             code_gen(parser_stack_head, t[1])
             parser_stack.pop()
         else:
-            raise Exception("Nahvi Error: ", parser_stack, t)
+            raise Exception("Syntax Error: ", parser_stack, t)
         print(parser_stack, token_index)
 
     elif t[0] in errors:
@@ -238,6 +239,7 @@ while parser_stack:
     else:
         raise ValueError(t)
 
-
 with open("output.txt", "w") as file:
     file.writelines(program_block)
+
+print(ids)
