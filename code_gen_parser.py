@@ -2,7 +2,7 @@
 # Ahmad Zaferani 97105985
 # Ali Shirmohammadi 97106068
 from scanner import get_next_token
-from intermediate_code_generator import code_gen, action_symbols, program_block
+from intermediate_code_generator import code_gen, action_symbols, program_block, push_into_semantic_stack
 
 valid_tokens = {"KEYWORD", "SYMBOL", "NUM", "WHITESPACE", "ID", "COMMENT"}
 errors = {"Invalid number", "Invalid input", "Unmatched comment", "Unclosed comment"}
@@ -17,15 +17,14 @@ parse_table = [
     ['Declaration', ['Declaration-initial', 'Declaration-prime'], ['Declaration-initial', 'Declaration-prime'], 'synch',
      'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch',
      'synch', '', '', '', '', '', '', '', '', '', '', '', ''],
-    ['Declaration-initial', ['Type-specifier', 'ID'], ['Type-specifier', 'ID'], '', '', '', 'synch', '', '', '', '', '',
-     '', '', 'synch', '', '', 'synch', 'synch', 'synch', '', '', '', '', '', '', '', '', ''],
+    ['Declaration-initial', ['Type-specifier', 'ID'], ['Type-specifier', 'ID'], '', '', '', 'synch', '',
+     '', '', '', '', '', '', 'synch', '', '', 'synch', 'synch', 'synch', '', '', '', '', '', '', '', '', ''],
     ['Declaration-prime', 'synch', 'synch', 'synch', 'synch', 'synch', ['Var-declaration-prime'], 'synch', 'synch',
      'synch', 'synch', 'synch', 'synch', 'synch', ['Fun-declaration-prime'], 'synch', 'synch',
-     ['Var-declaration-prime'],
-     '', '', '', '', '', '', '', '', '', '', ''],
-    ['Var-declaration-prime', 'synch', 'synch', 'synch', 'synch', 'synch', [';'], 'synch', 'synch', 'synch', 'synch',
-     'synch', 'synch', 'synch', 'synch', 'synch', 'synch', ['[', 'NUM', ']', ';'], '', '', '', '', '', '', '', '', '',
-     '', ''],
+     ['Var-declaration-prime'], '', '', '', '', '', '', '', '', '', '', ''],
+    ['Var-declaration-prime', 'synch', 'synch', 'synch', 'synch', 'synch', ['#id_declaration', ';'], 'synch', 'synch',
+     'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', ['[', 'NUM', ']', ';'], '', '', '', '',
+     '', '', '', '', '', '', ''],
     ['Fun-declaration-prime', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch',
      'synch', 'synch', 'synch', ['(', 'Params', ')', 'Compound-stmt'], 'synch', 'synch', '', '', '', '', '', '', '', '',
      '', '', '', ''],
@@ -201,6 +200,7 @@ while parser_stack:
         if t[0] == "ID":
             if t[1] not in ids:
                 ids.add(t[1])
+                push_into_semantic_stack(t[1])
     parser_stack_head = parser_stack[-1]
     if t[0] in valid_tokens:
         if t[0] == 'WHITESPACE' or t[0] == 'COMMENT':
@@ -223,12 +223,12 @@ while parser_stack:
                 parser_stack += reversed(M)
             elif M == 'epsilon':
                 non_terminal = parser_stack.pop()
+            elif parser_stack_head in action_symbols:
+                code_gen(parser_stack_head, t[1])
+                parser_stack.pop()
             else:
                 raise Exception("Syntax Error: ", parser_stack, t)
         elif parser_stack_head in parse_table[0]:
-            parser_stack.pop()
-        elif parser_stack_head in action_symbols:
-            code_gen(parser_stack_head, t[1])
             parser_stack.pop()
         else:
             raise Exception("Syntax Error: ", parser_stack, t)
@@ -240,6 +240,9 @@ while parser_stack:
         raise ValueError(t)
 
 with open("output.txt", "w") as file:
-    file.writelines(program_block)
+    for l in program_block:
+        if l == '':
+            break
+        file.write(l + '\n')
 
 print(ids)
