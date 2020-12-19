@@ -80,10 +80,10 @@ parse_table = [
      ['Simple-expression-zegond'], ['Simple-expression-zegond'], ['Simple-expression-zegond'], '', '', 'synch', 'synch',
      '', '', '', 'synch', '', '', '', '', ''],
     ['B', '', '', '', '', '', ['Simple-expression-prime'], '', '', '', '', '', ['Simple-expression-prime'],
-     ['Simple-expression-prime'], ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'], 
+     ['Simple-expression-prime'], ['Simple-expression-prime'], '', '', ['[', 'Expression', ']', 'H'],
      ['Simple-expression-prime'], ['Simple-expression-prime'], '', '', '', ['Simple-expression-prime'],
-     ['=', 'Expression', '#assign'], ['Simple-expression-prime'], ['Simple-expression-prime'], 
-     ['Simple-expression-prime'],['Simple-expression-prime']],
+     ['=', 'Expression', '#assign'], ['Simple-expression-prime'], ['Simple-expression-prime'],
+     ['Simple-expression-prime'], ['Simple-expression-prime']],
     ['H', '', '', '', '', '', ['G', 'D', 'C'], '', '', '', '', '', ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', '',
      ['G', 'D', 'C'], ['G', 'D', 'C'], '', '', '', ['G', 'D', 'C'], ['=', 'Expression', '#assign'], ['G', 'D', 'C'],
      ['G', 'D', 'C'], ['G', 'D', 'C'], ''],
@@ -110,8 +110,9 @@ parse_table = [
     ['Additive-expression-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['Term-zegond', 'D'],
      ['Term-zegond', 'D'], ['Term-zegond', 'D'], ['Term-zegond', 'D'], '', '', 'synch', 'synch', '', '', '', 'synch',
      '', '', 'synch', 'synch', ''],
-    ['D', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['Addop', 'Term', 'D'], ['Addop', 'Term', 'D'], '', '', '',
-     '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '', '', 'epsilon', 'epsilon', ''],
+    ['D', '', '', '', '', '', 'epsilon', '', '', '', '', '', ['#save_addop', 'Addop', 'Term', '#addop', 'D'],
+     ['#save_addop', 'Addop', 'Term', '#addop', 'D'], '', '', '', '', 'epsilon', 'epsilon', '', '', '', 'epsilon', '',
+     '', 'epsilon', 'epsilon', ''],
     ['Addop', '', '', '', '', '', '', '', '', '', '', 'synch', ['+'], ['-'], 'synch', 'synch', '', '', '', '', '', '',
      '', '', '', '', '', '', ''],
     ['Term', '', '', '', '', '', 'synch', '', '', '', '', ['Signed-factor', 'G'], ['Signed-factor', 'G'],
@@ -127,18 +128,20 @@ parse_table = [
      'synch', '', '', '', 'synch', '', '', 'synch', 'synch', ''],
     ['G', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '', '', 'epsilon', 'epsilon',
      '', '', '', 'epsilon', '', ['*', 'Signed-factor', 'G'], 'epsilon', 'epsilon', ''],
-    ['Signed-factor', '', '', '', '', '', 'synch', '', '', '', '', ['Factor'], ['+', 'Factor'], ['-', 'Factor'],
+    ['Signed-factor', '', '', '', '', '', 'synch', '', '', '', '', ['Factor'],
+     ['#psign', '+', 'Factor', '#correct_signed_number'], ['#psign', '-', 'Factor', '#correct_signed_number'],
      ['Factor'], ['Factor'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch', ''],
     ['Signed-factor-prime', '', '', '', '', '', ['Factor-prime'], '', '', '', '', '', ['Factor-prime'],
      ['Factor-prime'], ['Factor-prime'], '',
      '', '', ['Factor-prime'], ['Factor-prime'], '', '', '', ['Factor-prime'], '', ['Factor-prime'], ['Factor-prime'],
      ['Factor-prime'], ['Factor-prime']],
-    ['Signed-factor-zegond', '', '', '', '', '', 'synch', '', '', '', '', '', ['#psign', '+', 'Factor'], 
-     ['#psign', '-', 'Factor'], ['Factor-zegond'], ['Factor-zegond'], '', '', 'synch', 'synch', '', '', '', 'synch', 
-     '', 'synch', 'synch', 'synch', ''],
-    ['Factor', '', '', '', '', '', 'synch', '', '', '', '', ['ID', 'Var-call-prime'], 'synch', 'synch',
-     ['(', 'Expression', ')'], ['#psigned_num', 'NUM'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 
-     'synch', 'synch', ''],
+    ['Signed-factor-zegond', '', '', '', '', '', 'synch', '', '', '', '', '',
+     ['#psign', '+', 'Factor', '#correct_signed_number'], ['#psign', '-', 'Factor', '#correct_signed_number'],
+     ['Factor-zegond'], ['Factor-zegond'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch',
+     ''],
+    ['Factor', '', '', '', '', '', 'synch', '', '', '', '', ['#pid', 'ID', 'Var-call-prime'], 'synch', 'synch',
+     ['(', 'Expression', ')'], ['#pnum', 'NUM'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch',
+     'synch', ''],
     ['Var-call-prime', '', '', '', '', '', ['Var-prime'], '', '', '', '', '', ['Var-prime'], ['Var-prime'],
      ['(', 'Args', ')'], '',
      '', ['Var-prime'], ['Var-prime'], ['Var-prime'], '', '', '', ['Var-prime'], '', ['Var-prime'], ['Var-prime'],
@@ -239,9 +242,9 @@ while parser_stack:
         raise ValueError(t)
 
 with open("output.txt", "w") as file:
-    for l in program_block:
-        if l == '':
+    for li in program_block:
+        if li == '':
             break
-        file.write(l + '\n')
+        file.write(li + '\n')
 
 print(ids)
