@@ -1,6 +1,6 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_number', '#psign',
-                  '#save_addop'}
+                  '#save_addop', '#relop'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -60,13 +60,21 @@ def declare_id(identifier: str):
 def addop():
     global program_block_index
     t = get_temp()
-    print(semantic_stack)
     if semantic_stack[semantic_stack_top - 2] == '+':
         program_block[program_block_index] = '(ADD, %s, %s, %d)' % (semantic_stack[semantic_stack_top - 3],
                                                                     semantic_stack[semantic_stack_top - 1], t)
     elif semantic_stack[semantic_stack_top - 2] == '-':
         program_block[program_block_index] = '(SUB, %s, %s, %d)' % (semantic_stack[semantic_stack_top - 3],
                                                                     semantic_stack[semantic_stack_top - 1], t)
+    elif semantic_stack[semantic_stack_top - 2] == '*':
+        program_block[program_block_index] = '(MULT, %s, %s, %d)' % (semantic_stack[semantic_stack_top - 3],
+                                                                     semantic_stack[semantic_stack_top - 1], t)
+    elif semantic_stack[semantic_stack_top - 2] == '<':
+        program_block[program_block_index] = '(LT, %s, %s, %d)' % (semantic_stack[semantic_stack_top - 3],
+                                                                   semantic_stack[semantic_stack_top - 1], t)
+    elif semantic_stack[semantic_stack_top - 2] == '==':
+        program_block[program_block_index] = '(EQ, %s, %s, %d)' % (semantic_stack[semantic_stack_top - 3],
+                                                                   semantic_stack[semantic_stack_top - 1], t)
     program_block_index += 1
     pop_from_semantic_stack(3)
     push_into_semantic_stack(t)
@@ -81,14 +89,12 @@ def code_gen(a_s: str, arg: str):
         assign()
     elif a_s == '#pnum':
         push_into_semantic_stack('#' + arg)
-    elif a_s == '#psign':
+    elif a_s == '#psign' or a_s == '#save_addop':
         push_into_semantic_stack(arg)
     elif a_s == '#correct_signed_number':
         s = pop_from_semantic_stack(2)
         push_into_semantic_stack('#' + s[1] + s[0][1:])
-    elif a_s == '#addop':
+    elif a_s == '#addop' or a_s == '#mult' or a_s == '#relop':
         addop()
-    elif a_s == '#save_addop':
-        push_into_semantic_stack(arg)
     else:
         raise ValueError(a_s)
