@@ -1,6 +1,6 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_number', '#psign',
-                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if'}
+                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration', '#correct_assign'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -43,7 +43,7 @@ def assign():
         semantic_stack[semantic_stack_top - 1], semantic_stack[semantic_stack_top - 2])
     program_block_index += 1
     data_block.append(semantic_stack[semantic_stack_top - 1])
-    pop_from_semantic_stack(2)
+    pop_from_semantic_stack(1)
 
 
 def declare_id(identifier: str):
@@ -109,6 +109,18 @@ def else_func():
     program_block_index += 1
 
 
+def declare_arr():
+    temp = pop_from_semantic_stack(2)
+    arr_name = temp[1]
+    arr_length = int(temp[0][1:])
+    for i in range(arr_length):
+        s = arr_name + str(i)
+        symbol_table[s] = len(data_block) * 4 + 100
+        push_into_semantic_stack(symbol_table[s])
+        push_into_semantic_stack('#0')
+        assign()
+
+
 def code_gen(a_s: str, arg: str):
     if a_s == '#pid':
         push_id(arg)
@@ -135,5 +147,9 @@ def code_gen(a_s: str, arg: str):
         else_func()
     elif a_s == '#if':
         if_func()
+    elif a_s == '#arr_declaration':
+        declare_arr()
+    elif a_s == '#correct_assign':
+        pop_from_semantic_stack(1)
     else:
         raise ValueError(a_s)
