@@ -89,8 +89,8 @@ def save():
 def while_func():
     global program_block_index
     program_block[semantic_stack[semantic_stack_top - 1]] = '(JPF, %s, %d, )' % (semantic_stack[semantic_stack_top - 2],
-                                                                                 program_block_index)
-    program_block[program_block_index - 1] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 3]
+                                                                                 program_block_index + 2)
+    program_block[program_block_index] = '(JP, %s, , )' % (semantic_stack[semantic_stack_top - 3] + 1)
     program_block_index += 1
     pop_from_semantic_stack(3)
 
