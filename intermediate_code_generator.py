@@ -1,6 +1,6 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_number', '#psign',
-                  '#save_addop', '#relop', '#while', '#save', '#label'}
+                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -95,6 +95,20 @@ def while_func():
     pop_from_semantic_stack(3)
 
 
+def if_func():
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % (program_block_index + 1)
+    pop_from_semantic_stack(1)
+
+
+def else_func():
+    global program_block_index
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JPF, %s, %d, )' % (semantic_stack[semantic_stack_top - 2],
+                                                                                 program_block_index + 2)
+    pop_from_semantic_stack(2)
+    push_into_semantic_stack(program_block_index)
+    program_block_index += 1
+
+
 def code_gen(a_s: str, arg: str):
     if a_s == '#pid':
         push_id(arg)
@@ -117,5 +131,9 @@ def code_gen(a_s: str, arg: str):
         while_func()
     elif a_s == '#label':
         push_into_semantic_stack(program_block_index)
+    elif a_s == '#else':
+        else_func()
+    elif a_s == '#if':
+        if_func()
     else:
         raise ValueError(a_s)
