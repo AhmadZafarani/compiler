@@ -58,9 +58,9 @@ parse_table = [
     ['Selection-stmt', '', '', '', 'synch', 'synch', 'synch',
      ['if', '(', 'Expression', ')', 'Statement', 'else', 'Statement'], 'synch', 'synch', 'synch', 'synch', 'synch',
      'synch', 'synch', 'synch', 'synch', '', '', '', 'synch', 'synch', 'synch', '', '', '', '', '', ''],
-    ['Iteration-stmt', '', '', '', 'synch', 'synch', 'synch', 'synch', ['while', '(', 'Expression', ')', 'Statement'],
-     'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', 'synch', '', '', '', 'synch', 'synch', 'synch', '',
-     '', '', '', '', ''],
+    ['Iteration-stmt', '', '', '', 'synch', 'synch', 'synch', 'synch',
+     ['while', '#label', '(', 'Expression', ')', '#save', 'Statement', '#while'], 'synch', 'synch', 'synch', 'synch',
+     'synch', 'synch', 'synch', 'synch', '', '', '', 'synch', 'synch', 'synch', '', '', '', '', '', ''],
     ['Return-stmt', '', '', '', 'synch', 'synch', 'synch', 'synch', 'synch', ['return', 'Return-stmt-prime'], 'synch',
      'synch', 'synch', 'synch', 'synch', 'synch', 'synch', '', '', '', 'synch', 'synch', 'synch', '', '', '', '', '',
      ''],
@@ -224,11 +224,11 @@ while parser_stack:
             if isinstance(M, list):
                 parser_stack.pop()
                 parser_stack += reversed(M)
-            elif M == 'epsilon':
-                non_terminal = parser_stack.pop()
             elif parser_stack_head in action_symbols:
                 code_gen(parser_stack_head, t[1])
                 parser_stack.pop()
+            elif M == 'epsilon':
+                non_terminal = parser_stack.pop()
             else:
                 raise Exception("Syntax Error: ", parser_stack, t)
         elif parser_stack_head in parse_table[0]:
@@ -243,9 +243,11 @@ while parser_stack:
         raise ValueError(t)
 
 with open("output.txt", "w") as file:
+    counter = 1
     for li in program_block:
         if li == '':
             break
-        file.write(li + '\n')
+        file.write('%d' % counter + '\t' + li + '\n')
+        counter += 1
 
 print(ids)

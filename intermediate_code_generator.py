@@ -1,6 +1,6 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_number', '#psign',
-                  '#save_addop', '#relop'}
+                  '#save_addop', '#relop', '#while', '#save', '#label'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -80,6 +80,21 @@ def addop():
     push_into_semantic_stack(t)
 
 
+def save():
+    global program_block_index
+    push_into_semantic_stack(program_block_index)
+    program_block_index += 1
+
+
+def while_func():
+    global program_block_index
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JPF, %s, %d, )' % (semantic_stack[semantic_stack_top - 2],
+                                                                                 program_block_index)
+    program_block[program_block_index - 1] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 3]
+    program_block_index += 1
+    pop_from_semantic_stack(3)
+
+
 def code_gen(a_s: str, arg: str):
     if a_s == '#pid':
         push_id(arg)
@@ -96,5 +111,11 @@ def code_gen(a_s: str, arg: str):
         push_into_semantic_stack('#' + s[1] + s[0][1:])
     elif a_s == '#addop' or a_s == '#mult' or a_s == '#relop':
         addop()
+    elif a_s == '#save':
+        save()
+    elif a_s == '#while':
+        while_func()
+    elif a_s == '#label':
+        push_into_semantic_stack(program_block_index)
     else:
         raise ValueError(a_s)
