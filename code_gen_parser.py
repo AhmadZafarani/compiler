@@ -204,7 +204,7 @@ while parser_stack:
     else:
         next_token = t[0]
         if t[0] == "ID":
-            if t[1] not in ids:
+            if t[1] not in ids and t[1] != 'output':
                 ids.add(t[1])
                 push_into_semantic_stack(t[1])
     parser_stack_head = parser_stack[-1]

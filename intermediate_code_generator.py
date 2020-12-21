@@ -160,12 +160,13 @@ def correct_signed_factor():
 
 def printer():
     global program_block_index
-    x = pop_from_semantic_stack(3)
-    if x[1] == 'output' and x[2] == 'output':
+    x = pop_from_semantic_stack(2)
+    # if x[1] == 'output' and x[2] == 'output':
+    if x[1] == 'output':
         program_block[program_block_index] = '(PRINT, %d, , )' % x[0]
         program_block_index += 1
     else:
-        push_into_semantic_stack(x[2])
+        # push_into_semantic_stack(x[2])
         push_into_semantic_stack(x[1])
 
 
