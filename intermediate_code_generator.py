@@ -34,7 +34,10 @@ def pop_from_semantic_stack(num: int):
 
 
 def push_id(identifier: str):
-    p = symbol_table[identifier]
+    if identifier != 'output':
+        p = symbol_table[identifier]
+    else:
+        p = identifier
     push_into_semantic_stack(p)
 
 
@@ -155,6 +158,17 @@ def correct_signed_factor():
         push_into_semantic_stack('#' + s[1] + s[0][1:])
 
 
+def printer():
+    global program_block_index
+    x = pop_from_semantic_stack(3)
+    if x[1] == 'output' and x[2] == 'output':
+        program_block[program_block_index] = '(PRINT, %d, , )' % x[0]
+        program_block_index += 1
+    else:
+        push_into_semantic_stack(x[2])
+        push_into_semantic_stack(x[1])
+
+
 def code_gen(a_s: str, arg: str):
     if a_s == '#pid':
         push_id(arg)
@@ -183,7 +197,7 @@ def code_gen(a_s: str, arg: str):
     elif a_s == '#arr_declaration':
         declare_array()
     elif a_s == '#correct_assign':
-        pop_from_semantic_stack(1)
+        printer()
     elif a_s == '#arr_index':
         array_index()
     else:
