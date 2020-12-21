@@ -6,3 +6,4 @@ venv/
 *.txt
 .vscode/
 __pycache__/
+!grammar.txt

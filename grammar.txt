@@ -1,0 +1,92 @@
+﻿Program -> DeclarationList $
+DeclarationList -> Declaration DeclarationList
+DeclarationList -> ε
+Declaration -> DeclarationInitial DeclarationPrime
+DeclarationInitial -> TypeSpecifier #pid ID
+DeclarationPrime -> FunDeclarationPrime
+DeclarationPrime -> VarDeclarationPrime
+VarDeclarationPrime -> #id_declaration ;
+VarDeclarationPrime -> [ #pnum NUM ] #arr_declaration ;
+FunDeclarationPrime -> ( Params ) CompoundStmt
+TypeSpecifier -> int
+TypeSpecifier -> void
+Params -> int ID ParamPrime ParamList
+Params -> void ParamListVoidAbtar
+ParamListVoidAbtar -> ID ParamPrime ParamList
+ParamListVoidAbtar -> ε
+ParamList -> , Param ParamList
+ParamList -> ε
+Param -> DeclarationInitial ParamPrime
+ParamPrime -> [ ]
+ParamPrime -> ε
+CompoundStmt -> { DeclarationList StatementList }
+StatementList -> Statement StatementList
+StatementList -> ε
+Statement -> ExpressionStmt
+Statement -> CompoundStmt
+Statement -> SelectionStmt
+Statement -> IterationStmt
+Statement -> ReturnStmt
+Statement -> SwitchStmt
+ExpressionStmt -> Expression #correct_assign ;
+ExpressionStmt -> break ;
+ExpressionStmt -> ;
+SelectionStmt -> if ( Expression ) #save Statement else #else Statement #if
+IterationStmt -> while #label ( Expression ) #save Statement #while
+ReturnStmt -> return ReturnStmtPrime
+ReturnStmtPrime -> ;
+ReturnStmtPrime -> Expression ;
+SwitchStmt -> switch ( Expression ) { CaseStmts DefaultStmt }
+CaseStmts -> CaseStmt CaseStmts
+CaseStmts -> ε
+CaseStmt -> case NUM : StatementList
+DefaultStmt -> default : StatementList
+DefaultStmt -> ε
+Expression -> SimpleExpressionZegond
+Expression -> #pid ID B
+B -> = Expression #assign
+B -> [ Expression ] #arr_index H
+B -> SimpleExpressionPrime
+H -> = Expression #assign
+H -> G D C
+SimpleExpressionZegond -> AdditiveExpressionZegond C
+SimpleExpressionPrime -> AdditiveExpressionPrime C
+C -> #save_addop Relop AdditiveExpression #relop
+C -> ε
+Relop -> <
+Relop -> ==
+AdditiveExpression -> Term D
+AdditiveExpressionPrime -> TermPrime D
+AdditiveExpressionZegond -> TermZegond D
+D -> #save_addop Addop Term #addop D
+D -> ε
+Addop -> +
+Addop -> -
+Term -> SignedFactor G
+TermPrime -> SignedFactorPrime G
+TermZegond -> SignedFactorZegond G
+G -> #save_addop * SignedFactor #mult G
+G -> ε
+SignedFactor -> #psign + Factor #correct_signed_number
+SignedFactor -> #psign - Factor #correct_signed_number
+SignedFactor -> Factor
+SignedFactorPrime -> FactorPrime
+SignedFactorZegond -> #psign + Factor #correct_signed_factor
+SignedFactorZegond -> #psign - Factor #correct_signed_factor
+SignedFactorZegond -> FactorZegond
+Factor -> ( Expression )
+Factor -> #pid ID VarCallPrime
+Factor -> #pnum NUM
+VarCallPrime -> ( Args )
+VarCallPrime -> VarPrime
+VarPrime -> [ Expression ] #arr_index
+VarPrime -> ε
+FactorPrime -> ( Args )
+FactorPrime -> ε
+FactorZegond -> ( Expression )
+FactorZegond -> #pnum NUM
+Args -> ArgList
+Args -> ε
+ArgList -> Expression ArgListPrime
+ArgListPrime -> , Expression ArgListPrime
+ArgListPrime -> ε
