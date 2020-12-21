@@ -1,6 +1,7 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_number', '#psign',
-                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration', '#correct_assign'}
+                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration', 
+                  '#correct_assign', '#arr_index'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -109,16 +110,37 @@ def else_func():
     program_block_index += 1
 
 
-def declare_arr():
+def declare_array():
     temp = pop_from_semantic_stack(2)
     arr_name = temp[1]
+    symbol_table[arr_name] = len(data_block) * 4 + 100
     arr_length = int(temp[0][1:])
     for i in range(arr_length):
         s = arr_name + str(i)
-        symbol_table[s] = len(data_block) * 4 + 100
-        push_into_semantic_stack(symbol_table[s])
+        push_into_semantic_stack(len(data_block) * 4 + 100)
         push_into_semantic_stack('#0')
         assign()
+        pop_from_semantic_stack(1)
+
+
+def array_index():
+    global program_block_index
+    print(semantic_stack)
+    zero = int(semantic_stack[semantic_stack_top - 2])
+    top = semantic_stack[semantic_stack_top - 1]
+    if isinstance(top, int):
+        index = str(top)
+    else:
+        index = top
+    t = get_temp()
+    program_block[program_block_index] = '(MULT, %s, #4, %d)' % (index, t)
+    program_block_index += 1
+    t1 = get_temp()
+    program_block[program_block_index] = '(ADD, %d, #%d, %d)' % (t, zero, t1)
+    program_block_index += 1
+    pop_from_semantic_stack(2)
+    push_into_semantic_stack('@' + str(t1))
+
 
 
 def code_gen(a_s: str, arg: str):
@@ -148,8 +170,10 @@ def code_gen(a_s: str, arg: str):
     elif a_s == '#if':
         if_func()
     elif a_s == '#arr_declaration':
-        declare_arr()
+        declare_array()
     elif a_s == '#correct_assign':
         pop_from_semantic_stack(1)
+    elif a_s == '#arr_index':
+        array_index()
     else:
         raise ValueError(a_s)
