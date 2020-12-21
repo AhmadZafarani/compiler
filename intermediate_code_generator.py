@@ -1,5 +1,5 @@
 # YA FATEMEH
-action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_number', '#psign',
+action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_factor', '#psign',
                   '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration', 
                   '#correct_assign', '#arr_index'}
 semantic_stack = []
@@ -142,6 +142,18 @@ def array_index():
     push_into_semantic_stack('@' + str(t1))
 
 
+def correct_signed_factor():
+    global program_block_index
+    t = get_temp()
+    s = pop_from_semantic_stack(2)
+    print(semantic_stack, s)
+    if isinstance(s[0], int):
+        program_block[program_block_index] = '(SUB, #0, %d, %d)' % (s[0], t)
+        program_block_index += 1
+        push_into_semantic_stack(t)
+    else:
+        push_into_semantic_stack('#' + s[1] + s[0][1:])
+
 
 def code_gen(a_s: str, arg: str):
     if a_s == '#pid':
@@ -154,9 +166,8 @@ def code_gen(a_s: str, arg: str):
         push_into_semantic_stack('#' + arg)
     elif a_s == '#psign' or a_s == '#save_addop':
         push_into_semantic_stack(arg)
-    elif a_s == '#correct_signed_number':
-        s = pop_from_semantic_stack(2)
-        push_into_semantic_stack('#' + s[1] + s[0][1:])
+    elif a_s == '#correct_signed_factor':
+        correct_signed_factor()
     elif a_s == '#addop' or a_s == '#mult' or a_s == '#relop':
         addop()
     elif a_s == '#save':

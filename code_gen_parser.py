@@ -132,7 +132,7 @@ parse_table = [
     ['G', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '', '', 'epsilon', 'epsilon',
      '', '', '', 'epsilon', '', ['#save_addop', '*', 'Signed-factor', '#mult', 'G'], 'epsilon', 'epsilon', ''],
     ['Signed-factor', '', '', '', '', '', 'synch', '', '', '', '', ['Factor'],
-     ['#psign', '+', 'Factor', '#correct_signed_number'], ['#psign', '-', 'Factor', '#correct_signed_number'],
+     ['#psign', '+', 'Factor', '#correct_signed_factor'], ['#psign', '-', 'Factor', '#correct_signed_factor'],
      ['Factor'], ['Factor'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch', 'synch', ''],
     ['Signed-factor-prime', '', '', '', '', '', ['Factor-prime'], '', '', '', '', '', ['Factor-prime'],
      ['Factor-prime'], ['Factor-prime'], '',
