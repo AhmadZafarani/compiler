@@ -246,7 +246,7 @@ while parser_stack:
         raise ValueError(t)
 
 with open("output.txt", "w") as file:
-    counter = 1
+    counter = 0
     for li in program_block:
         if li == '':
             break

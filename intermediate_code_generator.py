@@ -7,7 +7,7 @@ semantic_stack_top = 0
 program_block = [''] * 400
 program_block_index = 0
 data_block = []
-temporary_block = 500
+temporary_block = 1000
 symbol_table = {}
 
 
@@ -52,7 +52,7 @@ def assign():
 
 def declare_id(identifier: str):
     s = pop_from_semantic_stack(1)[0]
-    symbol_table[s] = len(data_block) * 4 + 100
+    symbol_table[s] = len(data_block) * 4 + 500
     push_into_semantic_stack(symbol_table[s])
     if identifier == ';':
         push_into_semantic_stack('#0')
@@ -93,21 +93,21 @@ def save():
 def while_func():
     global program_block_index
     program_block[semantic_stack[semantic_stack_top - 1]] = '(JPF, %s, %d, )' % (semantic_stack[semantic_stack_top - 2],
-                                                                                 program_block_index + 2)
-    program_block[program_block_index] = '(JP, %s, , )' % (semantic_stack[semantic_stack_top - 3] + 1)
+                                                                                 program_block_index + 1)
+    program_block[program_block_index] = '(JP, %s, , )' % (semantic_stack[semantic_stack_top - 3])
     program_block_index += 1
     pop_from_semantic_stack(3)
 
 
 def if_func():
-    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % (program_block_index + 1)
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % (program_block_index)
     pop_from_semantic_stack(1)
 
 
 def else_func():
     global program_block_index
     program_block[semantic_stack[semantic_stack_top - 1]] = '(JPF, %s, %d, )' % (semantic_stack[semantic_stack_top - 2],
-                                                                                 program_block_index + 2)
+                                                                                 program_block_index + 1)
     pop_from_semantic_stack(2)
     push_into_semantic_stack(program_block_index)
     program_block_index += 1
@@ -116,11 +116,11 @@ def else_func():
 def declare_array():
     temp = pop_from_semantic_stack(2)
     arr_name = temp[1]
-    symbol_table[arr_name] = len(data_block) * 4 + 100
+    symbol_table[arr_name] = len(data_block) * 4 + 500
     arr_length = int(temp[0][1:])
     for i in range(arr_length):
         s = arr_name + str(i)
-        push_into_semantic_stack(len(data_block) * 4 + 100)
+        push_into_semantic_stack(len(data_block) * 4 + 500)
         push_into_semantic_stack('#0')
         assign()
         pop_from_semantic_stack(1)
@@ -160,10 +160,11 @@ def correct_signed_factor():
 
 def printer():
     global program_block_index
+    print('salaaaaaaaaaaaam', semantic_stack)
     x = pop_from_semantic_stack(2)
     # if x[1] == 'output' and x[2] == 'output':
     if x[1] == 'output':
-        program_block[program_block_index] = '(PRINT, %d, , )' % x[0]
+        program_block[program_block_index] = '(PRINT, %s, , )' % str(x[0])
         program_block_index += 1
     else:
         # push_into_semantic_stack(x[2])
