@@ -29,17 +29,17 @@ Statement -> IterationStmt
 Statement -> ReturnStmt
 Statement -> SwitchStmt
 ExpressionStmt -> Expression #correct_assign ;
-ExpressionStmt -> break ;
+ExpressionStmt -> break #jp_break ;
 ExpressionStmt -> ;
 SelectionStmt -> if ( Expression ) #save Statement else #else Statement #if
 IterationStmt -> while #label ( Expression ) #save Statement #while
-ReturnStmt -> return ReturnStmtPrime
+ReturnStmt -> return ReturnStmtPrime #return
 ReturnStmtPrime -> ;
 ReturnStmtPrime -> Expression ;
-SwitchStmt -> switch ( Expression ) { CaseStmts DefaultStmt }
+SwitchStmt -> switch #tmp_save ( Expression ) { CaseStmts DefaultStmt #jp_switch }
 CaseStmts -> CaseStmt CaseStmts
 CaseStmts -> ε
-CaseStmt -> case NUM : StatementList
+CaseStmt -> case #pnum NUM #cmp_save : StatementList #jpf
 DefaultStmt -> default : StatementList
 DefaultStmt -> ε
 Expression -> SimpleExpressionZegond

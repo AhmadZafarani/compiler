@@ -2,7 +2,7 @@
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_factor', '#psign',
                   '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration',
                   '#correct_assign', '#arr_index', '#function', '#parameter_declaration', '#activation_record',
-                  '#call_function'}
+                  '#call_function', '#return', '#jpf', '#jp_break', '#tmp_save', '#jp_switch', '#cmp_save'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -105,9 +105,9 @@ def while_func():
     pop_from_semantic_stack(3)
 
 
-def if_func():
-    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % program_block_index
-    pop_from_semantic_stack(1)
+def if_func(num: int):
+    program_block[semantic_stack[semantic_stack_top - num]] = '(JP, %s, , )' % program_block_index
+    pop_from_semantic_stack(num)
 
 
 def else_func():
@@ -179,17 +179,12 @@ def function():
     """
     if semantic_stack[0] == 'main':
         return
-    global program_block_index
+    return_func()
     func_name = symbol_table[semantic_stack[0]]
-    func_name.append(semantic_stack[semantic_stack_top - 2] + 1)
+    func_name.append(semantic_stack[semantic_stack_top - 1] + 1)
     symbol_table[semantic_stack[0]] = func_name
-    program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (semantic_stack[semantic_stack_top - 1],
-                                                                 symbol_table[semantic_stack[0]][0])
-    program_block_index += 1
-    program_block[program_block_index] = '(JP, @%s, , )' % symbol_table[semantic_stack[0]][1]
-    program_block_index += 1
-    program_block[semantic_stack[semantic_stack_top - 2]] = '(JP, %s, , )' % program_block_index
-    pop_from_semantic_stack(3)
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % program_block_index
+    pop_from_semantic_stack(2)
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
@@ -236,6 +231,49 @@ def call():
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
+def return_func():
+    global program_block_index
+    if not (isinstance(semantic_stack[semantic_stack_top - 1], int) and
+            0 <= semantic_stack[semantic_stack_top - 1] <= 500):
+        program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (semantic_stack[semantic_stack_top - 1],
+                                                                     symbol_table[semantic_stack[0]][0])
+        program_block_index += 1
+        pop_from_semantic_stack(1)
+    program_block[program_block_index] = '(JP, @%s, , )' % symbol_table[semantic_stack[0]][1]
+    program_block_index += 1
+    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+
+
+def temp_save():
+    global program_block_index
+    program_block[program_block_index] = '(JP, %s, , )' % (program_block_index + 2)
+    program_block_index += 1
+    save()
+
+
+def compare_save():
+    global program_block_index
+    t = get_temp()
+    program_block[program_block_index] = '(EQ, %s, %s, %d)' % (semantic_stack[semantic_stack_top - 2],
+                                                               semantic_stack[semantic_stack_top - 1], t)
+    program_block_index += 1
+    pop_from_semantic_stack(1)
+    push_into_semantic_stack(t)
+    save()
+
+
+def jump_break():
+    global program_block_index
+    program_block[program_block_index] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 4]
+    program_block_index += 1
+
+
+def jump_false():
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JPF, %s, %s, )' % (semantic_stack[semantic_stack_top - 2],
+                                                                                 program_block_index)
+    pop_from_semantic_stack(2)
+
+
 def code_gen(a_s: str, arg: str):
     print(semantic_stack, semantic_stack_top, symbol_table)
     if a_s == '#pid':
@@ -261,7 +299,7 @@ def code_gen(a_s: str, arg: str):
     elif a_s == '#else':
         else_func()
     elif a_s == '#if':
-        if_func()
+        if_func(1)
     elif a_s == '#arr_declaration':
         declare_array()
     elif a_s == '#correct_assign':
@@ -276,5 +314,17 @@ def code_gen(a_s: str, arg: str):
         activation_record()
     elif a_s == '#call_function':
         call()
+    elif a_s == '#return':
+        return_func()
+    elif a_s == '#tmp_save':
+        temp_save()
+    elif a_s == '#cmp_save':
+        compare_save()
+    elif a_s == '#jp_break':
+        jump_break()
+    elif a_s == '#jpf':
+        jump_false()
+    elif a_s == '#jp_switch':
+        if_func(2)
     else:
         raise ValueError(a_s)
