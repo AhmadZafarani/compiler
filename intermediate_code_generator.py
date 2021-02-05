@@ -1,7 +1,7 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_factor', '#psign',
                   '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration',
-                  '#correct_assign', '#arr_index', '#function', '#parameter_declaration', '#activation_record', 
+                  '#correct_assign', '#arr_index', '#function', '#parameter_declaration', '#activation_record',
                   '#call_function'}
 semantic_stack = []
 semantic_stack_top = 0
@@ -172,11 +172,23 @@ def printer():
 
 
 def function():
+    """ each function name in symbol table is a list with 3 elements:
+        0. address of return value in memory
+        1. address of cell in memory which contains index of program block that we called the function from there
+        2. index of program block which execution of function starts from there
+    """
     if semantic_stack[0] == 'main':
         return
+    global program_block_index
+    func_name = symbol_table[semantic_stack[0]]
+    func_name.append(semantic_stack[semantic_stack_top - 2] + 1)
+    symbol_table[semantic_stack[0]] = func_name
+    program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (semantic_stack[semantic_stack_top - 1],
+                                                                 symbol_table[semantic_stack[0]][0])
+    program_block_index += 1
+    program_block[program_block_index] = '(JP, @%s, , )' % symbol_table[semantic_stack[0]][1]
+    program_block_index += 1
     program_block[semantic_stack[semantic_stack_top - 2]] = '(JP, %s, , )' % program_block_index
-    func_ret_value = symbol_table[semantic_stack[0]]
-    symbol_table[semantic_stack[0]] = [semantic_stack[semantic_stack_top - 2] + 1, func_ret_value]
     pop_from_semantic_stack(3)
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
@@ -184,8 +196,10 @@ def function():
 def activation_record():
     if semantic_stack[0] == 'main':
         return
-    save()                                                          # jump to next function
-    symbol_table[semantic_stack[0]] = len(data_block) * 4 + 500     # create space for return value
+    save()  # jump to next function
+    e = len(data_block) * 4 + 500
+    symbol_table[semantic_stack[0]] = [e, e + 4]  # create space for return value and address
+    data_block.append(None)
     data_block.append(None)
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
@@ -198,6 +212,8 @@ def param_declare():
 
 
 def call():
+    if semantic_stack[semantic_stack_top - 2] == 'output':
+        return
     global program_block_index
     func_start_address = 0
     j = 0
@@ -206,11 +222,17 @@ def call():
             func_start_address = semantic_stack[j]
             break
     params = pop_from_semantic_stack(semantic_stack_top - j - 1)
-    start = params.pop()
+    pop_from_semantic_stack(1)
     for p in range(len(params)):
-        program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (params[p], 4 * (p + 1) + start)
-        program_block_index += 1 
+        program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (
+            params[p], 4 * (p + 1) + semantic_stack[semantic_stack_top - 1])
+        program_block_index += 1
+    program_block[program_block_index] = '(ASSIGN, %s, %s, )' % ('#' + str(program_block_index + 2),
+                                                                 semantic_stack[semantic_stack_top - 1])
+    program_block_index += 1
     program_block[program_block_index] = '(JP, %s, , )' % func_start_address
+    program_block_index += 1
+    pop_from_semantic_stack(1)
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
