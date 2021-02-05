@@ -1,7 +1,8 @@
 # YA FATEMEH
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_factor', '#psign',
-                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration', 
-                  '#correct_assign', '#arr_index'}
+                  '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration',
+                  '#correct_assign', '#arr_index', '#function', '#parameter_declaration', '#activation_record', 
+                  '#call_function'}
 semantic_stack = []
 semantic_stack_top = 0
 program_block = [''] * 400
@@ -24,7 +25,7 @@ def push_into_semantic_stack(identifier):
     semantic_stack_top += 1
 
 
-def pop_from_semantic_stack(num: int):
+def pop_from_semantic_stack(num: int) -> list:
     global semantic_stack_top
     x = []
     for i in range(num):
@@ -36,6 +37,10 @@ def pop_from_semantic_stack(num: int):
 def push_id(identifier: str):
     if identifier != 'output':
         p = symbol_table[identifier]
+        if isinstance(p, list):
+            for item in p:
+                push_into_semantic_stack(item)
+            return
     else:
         p = identifier
     push_into_semantic_stack(p)
@@ -59,6 +64,7 @@ def declare_id(identifier: str):
     else:
         push_into_semantic_stack(identifier)
     assign()
+    pop_from_semantic_stack(1)
 
 
 def addop():
@@ -100,7 +106,7 @@ def while_func():
 
 
 def if_func():
-    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % (program_block_index)
+    program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % program_block_index
     pop_from_semantic_stack(1)
 
 
@@ -119,7 +125,6 @@ def declare_array():
     symbol_table[arr_name] = len(data_block) * 4 + 500
     arr_length = int(temp[0][1:])
     for i in range(arr_length):
-        s = arr_name + str(i)
         push_into_semantic_stack(len(data_block) * 4 + 500)
         push_into_semantic_stack('#0')
         assign()
@@ -128,7 +133,6 @@ def declare_array():
 
 def array_index():
     global program_block_index
-    print(semantic_stack)
     zero = int(semantic_stack[semantic_stack_top - 2])
     top = semantic_stack[semantic_stack_top - 1]
     if isinstance(top, int):
@@ -149,7 +153,6 @@ def correct_signed_factor():
     global program_block_index
     t = get_temp()
     s = pop_from_semantic_stack(2)
-    print(semantic_stack, s)
     if isinstance(s[0], int):
         program_block[program_block_index] = '(SUB, #0, %d, %d)' % (s[0], t)
         program_block_index += 1
@@ -160,18 +163,59 @@ def correct_signed_factor():
 
 def printer():
     global program_block_index
-    print('salaaaaaaaaaaaam', semantic_stack)
     x = pop_from_semantic_stack(2)
-    # if x[1] == 'output' and x[2] == 'output':
     if x[1] == 'output':
         program_block[program_block_index] = '(PRINT, %s, , )' % str(x[0])
         program_block_index += 1
     else:
-        # push_into_semantic_stack(x[2])
         push_into_semantic_stack(x[1])
 
 
+def function():
+    if semantic_stack[0] == 'main':
+        return
+    program_block[semantic_stack[semantic_stack_top - 2]] = '(JP, %s, , )' % program_block_index
+    func_ret_value = symbol_table[semantic_stack[0]]
+    symbol_table[semantic_stack[0]] = [semantic_stack[semantic_stack_top - 2] + 1, func_ret_value]
+    pop_from_semantic_stack(3)
+    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+
+
+def activation_record():
+    if semantic_stack[0] == 'main':
+        return
+    save()                                                          # jump to next function
+    symbol_table[semantic_stack[0]] = len(data_block) * 4 + 500     # create space for return value
+    data_block.append(None)
+    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+
+
+def param_declare():
+    parameter = pop_from_semantic_stack(1)[0]
+    symbol_table[parameter] = len(data_block) * 4 + 500
+    data_block.append(None)
+    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+
+
+def call():
+    global program_block_index
+    func_start_address = 0
+    j = 0
+    for j in range(semantic_stack_top - 1, 1, -1):
+        if isinstance(semantic_stack[j], int) and 0 < semantic_stack[j] < 500:
+            func_start_address = semantic_stack[j]
+            break
+    params = pop_from_semantic_stack(semantic_stack_top - j - 1)
+    start = params.pop()
+    for p in range(len(params)):
+        program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (params[p], 4 * (p + 1) + start)
+        program_block_index += 1 
+    program_block[program_block_index] = '(JP, %s, , )' % func_start_address
+    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+
+
 def code_gen(a_s: str, arg: str):
+    print(semantic_stack, semantic_stack_top, symbol_table)
     if a_s == '#pid':
         push_id(arg)
     elif a_s == '#id_declaration':
@@ -202,5 +246,13 @@ def code_gen(a_s: str, arg: str):
         printer()
     elif a_s == '#arr_index':
         array_index()
+    elif a_s == '#function':
+        function()
+    elif a_s == '#parameter_declaration':
+        param_declare()
+    elif a_s == '#activation_record':
+        activation_record()
+    elif a_s == '#call_function':
+        call()
     else:
         raise ValueError(a_s)

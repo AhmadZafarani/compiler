@@ -2,19 +2,19 @@
 DeclarationList -> Declaration DeclarationList
 DeclarationList -> ε
 Declaration -> DeclarationInitial DeclarationPrime
-DeclarationInitial -> TypeSpecifier #pid ID
+DeclarationInitial -> TypeSpecifier ID
 DeclarationPrime -> FunDeclarationPrime
 DeclarationPrime -> VarDeclarationPrime
 VarDeclarationPrime -> #id_declaration ;
 VarDeclarationPrime -> [ #pnum NUM ] #arr_declaration ;
-FunDeclarationPrime -> ( Params ) CompoundStmt
+FunDeclarationPrime -> #activation_record ( Params ) CompoundStmt #function
 TypeSpecifier -> int
 TypeSpecifier -> void
-Params -> int ID ParamPrime ParamList
+Params -> int ID ParamPrime #parameter_declaration ParamList
 Params -> void ParamListVoidAbtar
 ParamListVoidAbtar -> ID ParamPrime ParamList
 ParamListVoidAbtar -> ε
-ParamList -> , Param ParamList
+ParamList -> , Param ParamList #parameter_declaration
 ParamList -> ε
 Param -> DeclarationInitial ParamPrime
 ParamPrime -> [ ]
@@ -67,8 +67,8 @@ TermPrime -> SignedFactorPrime G
 TermZegond -> SignedFactorZegond G
 G -> #save_addop * SignedFactor #mult G
 G -> ε
-SignedFactor -> #psign + Factor #correct_signed_number
-SignedFactor -> #psign - Factor #correct_signed_number
+SignedFactor -> #psign + Factor #correct_signed_factor
+SignedFactor -> #psign - Factor #correct_signed_factor
 SignedFactor -> Factor
 SignedFactorPrime -> FactorPrime
 SignedFactorZegond -> #psign + Factor #correct_signed_factor
@@ -81,7 +81,7 @@ VarCallPrime -> ( Args )
 VarCallPrime -> VarPrime
 VarPrime -> [ Expression ] #arr_index
 VarPrime -> ε
-FactorPrime -> ( Args )
+FactorPrime -> ( Args ) #call_function
 FactorPrime -> ε
 FactorZegond -> ( Expression )
 FactorZegond -> #pnum NUM
