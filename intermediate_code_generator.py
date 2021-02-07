@@ -1,5 +1,5 @@
 # YA FATEMEH
-from collections import OrderedDict
+# from collections import OrderedDict
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_factor', '#psign',
                   '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration',
                   '#correct_assign', '#arr_index', '#function', '#parameter_declaration', '#activation_record',
@@ -10,7 +10,26 @@ program_block = [''] * 400
 program_block_index = 0
 data_block = []
 temporary_block = 1000
-symbol_table = OrderedDict()
+symbol_table = {}
+scope_stack = []
+last_seen_token = ''
+
+
+def id_first_occurrence(identifier):
+    global last_seen_token
+    last_seen_token = identifier
+    if identifier not in symbol_table and identifier != 'output':
+        if search_in_symbol_table(identifier) is not None:
+            return
+        symbol_table[identifier] = None
+        push_into_semantic_stack(identifier)
+
+
+def search_in_symbol_table(identifier):
+    for s in reversed(scope_stack):
+        if identifier in s:
+            return s[identifier]
+    return None
 
 
 def get_temp() -> int:
@@ -37,7 +56,10 @@ def pop_from_semantic_stack(num: int) -> list:
 
 def push_id(identifier: str):
     if identifier != 'output':
-        p = symbol_table[identifier]
+        try:
+            p = symbol_table[identifier]
+        except KeyError:
+            p = search_in_symbol_table(identifier)
         if isinstance(p, list):
             for item in p:
                 push_into_semantic_stack(item)
@@ -57,6 +79,8 @@ def assign():
 
 
 def declare_id(identifier: str):
+    if semantic_stack_top == 2:
+        push_into_semantic_stack(last_seen_token)
     s = pop_from_semantic_stack(1)[0]
     symbol_table[s] = len(data_block) * 4 + 500
     push_into_semantic_stack(symbol_table[s])
@@ -130,6 +154,13 @@ def declare_array():
         push_into_semantic_stack('#0')
         assign()
         pop_from_semantic_stack(1)
+    # declare a pointer to first entry of array
+    arr_address = len(data_block) * 4 + 500
+    push_into_semantic_stack(arr_address)
+    push_into_semantic_stack('#' + str(symbol_table[arr_name]))
+    assign()
+    pop_from_semantic_stack(1)
+    symbol_table[arr_name] = arr_address
 
 
 def array_index():
@@ -144,7 +175,7 @@ def array_index():
     program_block[program_block_index] = '(MULT, %s, #4, %d)' % (index, t)
     program_block_index += 1
     t1 = get_temp()
-    program_block[program_block_index] = '(ADD, %d, #%d, %d)' % (t, zero, t1)
+    program_block[program_block_index] = '(ADD, %d, %d, %d)' % (t, zero, t1)
     program_block_index += 1
     pop_from_semantic_stack(2)
     push_into_semantic_stack('@' + str(t1))
@@ -180,25 +211,18 @@ def function():
     """
     if semantic_stack[0] == 'main':
         return
+    global symbol_table
     return_func()
+    symbol_table = scope_stack.pop()
     func_name = symbol_table[semantic_stack[0]]
     func_name.append(semantic_stack[semantic_stack_top - 1] + 1)
     symbol_table[semantic_stack[0]] = func_name
     program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % program_block_index
     pop_from_semantic_stack(2)
-    # remove local variables of function from symbol table
-    keys = []
-    for key, value in reversed(symbol_table.items()):
-        if not isinstance(value, list):
-            keys.append(key)
-        else:
-            break
-    for k in keys:
-        symbol_table.pop(k)
-    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
 def activation_record():
+    global symbol_table
     if semantic_stack[0] == 'main':
         return
     save()  # jump to next function
@@ -206,14 +230,15 @@ def activation_record():
     symbol_table[semantic_stack[0]] = [e, e + 4]  # create space for return value and address
     data_block.append(None)
     data_block.append(None)
-    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+    scope_stack.append(symbol_table)
+    symbol_table = dict()
+    print(scope_stack)
 
 
 def param_declare():
     parameter = pop_from_semantic_stack(1)[0]
     symbol_table[parameter] = len(data_block) * 4 + 500
     data_block.append(None)
-    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
 def call():
@@ -248,25 +273,23 @@ def call():
     program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (ret_value, t)
     program_block_index += 1
     push_into_semantic_stack(t)
-    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
 def return_func():
     global program_block_index
+    st = scope_stack[-1]
     # for void functions we don't need (explicit) return value
     if not (isinstance(semantic_stack[semantic_stack_top - 1], int) and
             0 <= semantic_stack[semantic_stack_top - 1] <= 500):
         program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (semantic_stack[semantic_stack_top - 1],
-                                                                     symbol_table[semantic_stack[0]][0])
-        program_block_index += 1
+                                                                     st[semantic_stack[0]][0])
         pop_from_semantic_stack(1)
     else:
         program_block[program_block_index] = '(ASSIGN, #%s, %s, )' % (semantic_stack[semantic_stack_top - 1],
-                                                                      symbol_table[semantic_stack[0]][0])
-        program_block_index += 1
-    program_block[program_block_index] = '(JP, @%s, , )' % symbol_table[semantic_stack[0]][1]
+                                                                      st[semantic_stack[0]][0])
     program_block_index += 1
-    print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
+    program_block[program_block_index] = '(JP, @%s, , )' % st[semantic_stack[0]][1]
+    program_block_index += 1
 
 
 def temp_save():
@@ -297,7 +320,6 @@ def jump_break():
         program_block_index += 1
         program_block[program_block_index] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 3]
     program_block_index += 1
-    print(semantic_stack, program_block)
 
 
 def jump_false():
@@ -307,7 +329,7 @@ def jump_false():
 
 
 def code_gen(a_s: str, arg: str):
-    print(semantic_stack, semantic_stack_top, symbol_table, program_block)
+    print(semantic_stack, semantic_stack_top, symbol_table, scope_stack, program_block)
     if a_s == '#pid':
         push_id(arg)
     elif a_s == '#id_declaration':
