@@ -2,7 +2,7 @@
 # Ahmad Zaferani 97105985
 # Ali Shirmohammadi 97106068
 from scanner import get_next_token
-from intermediate_code_generator import code_gen, action_symbols, program_block, push_into_semantic_stack
+from intermediate_code_generator import code_gen, action_symbols, program_block, push_into_semantic_stack, symbol_table
 
 valid_tokens = {"KEYWORD", "SYMBOL", "NUM", "WHITESPACE", "ID", "COMMENT"}
 errors = {"Invalid number", "Invalid input", "Unmatched comment", "Unclosed comment"}
@@ -146,9 +146,8 @@ parse_table = [
      ['(', 'Expression', ')'], ['#pnum', 'NUM'], '', '', 'synch', 'synch', '', '', '', 'synch', '', 'synch', 'synch',
      'synch', ''],
     ['Var-call-prime', '', '', '', '', '', ['Var-prime'], '', '', '', '', '', ['Var-prime'], ['Var-prime'],
-     ['(', 'Args', ')'], '',
-     '', ['Var-prime'], ['Var-prime'], ['Var-prime'], '', '', '', ['Var-prime'], '', ['Var-prime'], ['Var-prime'],
-     ['Var-prime'], ''],
+     ['(', 'Args', ')', '#call_function'], '', '', ['Var-prime'], ['Var-prime'], ['Var-prime'], '', '', '',
+     ['Var-prime'], '', ['Var-prime'], ['Var-prime'], ['Var-prime'], ''],
     ['Var-prime', '', '', '', '', '', 'epsilon', '', '', '', '', '', 'epsilon', 'epsilon', '', '', '',
      ['[', 'Expression', ']', '#arr_index'], 'epsilon', 'epsilon', '', '', '', 'epsilon', '', 'epsilon', 'epsilon',
      'epsilon', ''],
@@ -199,7 +198,7 @@ def find_in_table(row, col):
     return parse_table[ii][jj]
 
 
-ids = set()
+ids = symbol_table
 while parser_stack:
     t = tokens[token_index]
     if t[0] == 'SYMBOL' or t[0] == 'KEYWORD':
@@ -207,8 +206,8 @@ while parser_stack:
     else:
         next_token = t[0]
         if t[0] == "ID":
-            if t[1] not in ids and t[1] != 'output':
-                ids.add(t[1])
+            if t[1] not in ids.keys() and t[1] != 'output':
+                ids[t[1]] = None
                 push_into_semantic_stack(t[1])
     parser_stack_head = parser_stack[-1]
     if t[0] in valid_tokens:

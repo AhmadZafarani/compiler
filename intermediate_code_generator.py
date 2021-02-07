@@ -1,4 +1,5 @@
 # YA FATEMEH
+from collections import OrderedDict
 action_symbols = {"#pid", "#assign", "#addop", "#mult", '#id_declaration', "#pnum", '#correct_signed_factor', '#psign',
                   '#save_addop', '#relop', '#while', '#save', '#label', '#else', '#if', '#arr_declaration',
                   '#correct_assign', '#arr_index', '#function', '#parameter_declaration', '#activation_record',
@@ -9,7 +10,7 @@ program_block = [''] * 400
 program_block_index = 0
 data_block = []
 temporary_block = 1000
-symbol_table = {}
+symbol_table = OrderedDict()
 
 
 def get_temp() -> int:
@@ -185,6 +186,15 @@ def function():
     symbol_table[semantic_stack[0]] = func_name
     program_block[semantic_stack[semantic_stack_top - 1]] = '(JP, %s, , )' % program_block_index
     pop_from_semantic_stack(2)
+    # remove local variables of function from symbol table
+    keys = []
+    for key, value in reversed(symbol_table.items()):
+        if not isinstance(value, list):
+            keys.append(key)
+        else:
+            break
+    for k in keys:
+        symbol_table.pop(k)
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
@@ -217,28 +227,43 @@ def call():
             func_start_address = semantic_stack[j]
             break
     params = pop_from_semantic_stack(semantic_stack_top - j - 1)
+    params = list(reversed(params))
     pop_from_semantic_stack(1)
+    # assign arguments to parameters of function
     for p in range(len(params)):
         program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (
             params[p], 4 * (p + 1) + semantic_stack[semantic_stack_top - 1])
         program_block_index += 1
+    # assign return address (num of instruction) to return address of function for implicit jump
     program_block[program_block_index] = '(ASSIGN, %s, %s, )' % ('#' + str(program_block_index + 2),
                                                                  semantic_stack[semantic_stack_top - 1])
     program_block_index += 1
+    # jump to start of function (first instruction)
     program_block[program_block_index] = '(JP, %s, , )' % func_start_address
     program_block_index += 1
     pop_from_semantic_stack(1)
+    # copy return value to a temporary memory location
+    t = get_temp()
+    ret_value = pop_from_semantic_stack(1)[0]
+    program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (ret_value, t)
+    program_block_index += 1
+    push_into_semantic_stack(t)
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
 
 
 def return_func():
     global program_block_index
+    # for void functions we don't need (explicit) return value
     if not (isinstance(semantic_stack[semantic_stack_top - 1], int) and
             0 <= semantic_stack[semantic_stack_top - 1] <= 500):
         program_block[program_block_index] = '(ASSIGN, %s, %s, )' % (semantic_stack[semantic_stack_top - 1],
                                                                      symbol_table[semantic_stack[0]][0])
         program_block_index += 1
         pop_from_semantic_stack(1)
+    else:
+        program_block[program_block_index] = '(ASSIGN, #%s, %s, )' % (semantic_stack[semantic_stack_top - 1],
+                                                                      symbol_table[semantic_stack[0]][0])
+        program_block_index += 1
     program_block[program_block_index] = '(JP, @%s, , )' % symbol_table[semantic_stack[0]][1]
     program_block_index += 1
     print(semantic_stack, semantic_stack_top, program_block, program_block_index, symbol_table)
@@ -248,6 +273,7 @@ def temp_save():
     global program_block_index
     program_block[program_block_index] = '(JP, %s, , )' % (program_block_index + 2)
     program_block_index += 1
+    push_into_semantic_stack('switch-case')
     save()
 
 
@@ -264,8 +290,14 @@ def compare_save():
 
 def jump_break():
     global program_block_index
-    program_block[program_block_index] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 4]
+    if semantic_stack_top >= 5 and semantic_stack[semantic_stack_top - 5] == 'switch-case':
+        program_block[program_block_index] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 4]
+    else:
+        program_block[program_block_index] = '(ASSIGN, #0, %s, )' % semantic_stack[semantic_stack_top - 4]
+        program_block_index += 1
+        program_block[program_block_index] = '(JP, %s, , )' % semantic_stack[semantic_stack_top - 3]
     program_block_index += 1
+    print(semantic_stack, program_block)
 
 
 def jump_false():
@@ -275,7 +307,7 @@ def jump_false():
 
 
 def code_gen(a_s: str, arg: str):
-    print(semantic_stack, semantic_stack_top, symbol_table)
+    print(semantic_stack, semantic_stack_top, symbol_table, program_block)
     if a_s == '#pid':
         push_id(arg)
     elif a_s == '#id_declaration':
@@ -326,5 +358,6 @@ def code_gen(a_s: str, arg: str):
         jump_false()
     elif a_s == '#jp_switch':
         if_func(2)
+        pop_from_semantic_stack(1)
     else:
         raise ValueError(a_s)

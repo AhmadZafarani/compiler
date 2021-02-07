@@ -77,7 +77,7 @@ SignedFactorZegond -> FactorZegond
 Factor -> ( Expression )
 Factor -> #pid ID VarCallPrime
 Factor -> #pnum NUM
-VarCallPrime -> ( Args )
+VarCallPrime -> ( Args ) #call_function
 VarCallPrime -> VarPrime
 VarPrime -> [ Expression ] #arr_index
 VarPrime -> ε
